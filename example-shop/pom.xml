@@ -10,7 +10,6 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>example-shop</artifactId>
-  <packaging>jar</packaging>
 
   <build>
     <plugins>
@@ -18,6 +17,10 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>2.3.0.RELEASE</version>
+        <configuration>
+          <mainClass>de.codecentric.ddd.hexagonal.monolith.ExampleShopApplication</mainClass>
+          <layout>ZIP</layout>
+        </configuration>
       </plugin>
     </plugins>
   </build>
