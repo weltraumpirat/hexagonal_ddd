@@ -22,8 +22,8 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     this.repository = repository;
   }
 
-  @Override public List<ShoppingCart> getShoppingCarts() {
-    return repository.findAll();
+  @Override public ShoppingCart getShoppingCartById( final UUID cartId ) {
+    return repository.findById( cartId );
   }
 
   @Override public UUID createEmptyShoppingCart() {
@@ -33,7 +33,7 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
   }
 
   @Override public void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem shoppingCartItem ) {
-    productValidationService.validate(shoppingCartItem);
+    productValidationService.validate( shoppingCartItem );
     final ShoppingCartEntity cart = ShoppingCartFactory.create( repository.findById( cartId ) );
     cart.addItem( shoppingCartItem );
     repository.update( ShoppingCartFactory.create( cart ) );

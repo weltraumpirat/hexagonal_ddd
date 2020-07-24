@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import static de.codecentric.ddd.hexagonal.monolith.config.json.AmountMapper.toAmount;
 import de.codecentric.ddd.hexagonal.monolith.domain.product.api.Amount;
-import de.codecentric.ddd.hexagonal.monolith.domain.product.api.Fluid;
 
 import java.io.IOException;
 
@@ -22,11 +22,7 @@ public class AmountDeserializer extends StdDeserializer<Amount> {
     throws IOException {
     JsonNode node = p.getCodec().readTree( p );
     final String amount = node.asText();
-    switch(amount) {
-      case "0.5l":
-      case "1l":
-        return Fluid.forValue( amount );
-    }
-    return null;
+    return toAmount( amount );
   }
+
 }

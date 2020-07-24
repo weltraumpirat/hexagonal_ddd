@@ -2,7 +2,7 @@ package de.codecentric.ddd.hexagonal.monolith.domain.product.api;
 
 import static de.codecentric.ddd.hexagonal.monolith.domain.product.api.Fluid.HALF_LITRE;
 import de.codecentric.ddd.hexagonal.monolith.domain.product.impl.ProductsApiImpl;
-import de.codecentric.ddd.hexagonal.monolith.persistence.ProductRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.monolith.product.persistence.ProductRepositoryInMemory;
 import jdk.jfr.Description;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.joda.money.CurrencyUnit;

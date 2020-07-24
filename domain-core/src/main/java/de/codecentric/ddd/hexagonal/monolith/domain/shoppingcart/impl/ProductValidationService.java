@@ -2,7 +2,9 @@ package de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl;
 
 import de.codecentric.ddd.hexagonal.monolith.domain.product.api.ProductsApi;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartItem;
+import lombok.extern.java.Log;
 
+@Log
 public class ProductValidationService {
   private final ProductsApi api;
 

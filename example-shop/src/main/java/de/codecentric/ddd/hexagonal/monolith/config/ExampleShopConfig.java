@@ -15,9 +15,13 @@ import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCar
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.CheckoutService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ProductValidationService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ShoppingCartsApiImpl;
-import de.codecentric.ddd.hexagonal.monolith.persistence.OrderRepositoryInMemory;
-import de.codecentric.ddd.hexagonal.monolith.persistence.ProductRepositoryInMemory;
-import de.codecentric.ddd.hexagonal.monolith.persistence.ShoppingCartRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.monolith.order.persistence.OrderPositionCrudRepository;
+import de.codecentric.ddd.hexagonal.monolith.order.persistence.OrderRepositoryJpa;
+import de.codecentric.ddd.hexagonal.monolith.product.persistence.ProductCrudRepository;
+import de.codecentric.ddd.hexagonal.monolith.product.persistence.ProductRepositoryJpa;
+import de.codecentric.ddd.hexagonal.monolith.shoppingcart.persistence.ShoppingCartCrudRepository;
+import de.codecentric.ddd.hexagonal.monolith.shoppingcart.persistence.ShoppingCartItemCrudRepository;
+import de.codecentric.ddd.hexagonal.monolith.shoppingcart.persistence.ShoppingCartRepositoryJpa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,18 +30,23 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class ExampleShopConfig {
   @Bean
-   ProductsApi createProductApi() {
-    return new ProductsApiImpl( new ProductRepositoryInMemory() );
+  ProductsApi createProductApi( @Autowired final ProductCrudRepository jpaRepository ) {
+    return new ProductsApiImpl( new ProductRepositoryJpa( jpaRepository ) );
   }
 
   @Bean
-   OrdersApi createOrdersApi() {
-    return new OrdersApiImpl( new OrderRepositoryInMemory() );
+  OrdersApi createOrdersApi( @Autowired final OrderPositionCrudRepository crudRepository ) {
+    return new OrdersApiImpl( new OrderRepositoryJpa( crudRepository ) );
   }
 
   @Bean
-   ShoppingCartsApi createShoppingCartsApi(@Autowired final OrdersApi ordersApi, @Autowired final ProductsApi productsApi ) {
-    return new ShoppingCartsApiImpl( new CheckoutService( ordersApi ), new ProductValidationService( productsApi ), new ShoppingCartRepositoryInMemory() );
+  ShoppingCartsApi createShoppingCartsApi( @Autowired final OrdersApi ordersApi,
+                                           @Autowired final ProductsApi productsApi,
+                                           @Autowired final ShoppingCartCrudRepository cartRepository,
+                                           @Autowired final ShoppingCartItemCrudRepository cartItemRepository ) {
+    return new ShoppingCartsApiImpl( new CheckoutService( ordersApi ),
+                                     new ProductValidationService( productsApi ),
+                                     new ShoppingCartRepositoryJpa( cartRepository, cartItemRepository ) );
   }
 
   @Bean

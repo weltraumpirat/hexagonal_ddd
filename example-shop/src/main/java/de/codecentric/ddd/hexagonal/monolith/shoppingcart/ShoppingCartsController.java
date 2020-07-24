@@ -3,14 +3,17 @@ package de.codecentric.ddd.hexagonal.monolith.shoppingcart;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.ShoppingCartNotFoundException;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartsApi;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Log
 @RestController
 public class ShoppingCartsController {
   private final ShoppingCartsApi api;
@@ -39,8 +42,9 @@ public class ShoppingCartsController {
     try {
       api.addItemToShoppingCart( cartId, item );
     } catch( NoSuchElementException e ) {
+      e.printStackTrace();
       throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "The provided item is not a valid product." );
-    }catch( ShoppingCartNotFoundException e ) {
+    } catch( ShoppingCartNotFoundException e ) {
       throw shoppingCartNotFoundResponse( cartId, e );
     }
   }
@@ -54,8 +58,9 @@ public class ShoppingCartsController {
     }
   }
 
-  @PostMapping("/cart/{cartId}/checkout")
-  public void checkOutShoppingCart(@PathVariable final UUID cartId) {
+  @PostMapping( "/cart/{cartId}/checkout" )
+  @Transactional
+  public void checkOutShoppingCart( @PathVariable final UUID cartId ) {
     try {
       api.checkOut( cartId );
     } catch( ShoppingCartNotFoundException e ) {

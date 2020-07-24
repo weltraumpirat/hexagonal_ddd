@@ -9,15 +9,18 @@ import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCar
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.CheckoutService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ProductValidationService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ShoppingCartsApiImpl;
-import de.codecentric.ddd.hexagonal.monolith.persistence.OrderRepositoryInMemory;
-import de.codecentric.ddd.hexagonal.monolith.persistence.ProductRepositoryInMemory;
-import de.codecentric.ddd.hexagonal.monolith.persistence.ShoppingCartRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.monolith.product.persistence.OrderRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.monolith.product.persistence.ProductRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.monolith.product.persistence.ShoppingCartRepositoryInMemory;
 import jdk.jfr.Description;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -28,11 +31,13 @@ public class ShoppingCartsApiTest {
   public static final UUID            ITEM_ID = UUID.randomUUID();
   private             OrdersApi       ordersApi;
   private             CheckoutService checkoutService;
-  private ProductsApiImpl productsApi;
+  private             ProductsApiImpl productsApi;
+
   @BeforeEach
-   void setUp() {
+  void setUp() {
     productsApi = new ProductsApiImpl( new ProductRepositoryInMemory() );
-    productsApi.addProduct( new Product( UUID.randomUUID(), "Whole Milk", PackagingType.CARTON, Money.of( CurrencyUnit.EUR, new BigDecimal( "1" ) ), HALF_LITRE ) );
+    productsApi.addProduct( new Product( UUID.randomUUID(), "Whole Milk", PackagingType.CARTON,
+                                         Money.of( CurrencyUnit.EUR, new BigDecimal( "1" ) ), HALF_LITRE ) );
   }
 
   @Nested
@@ -60,7 +65,7 @@ public class ShoppingCartsApiTest {
 
       @Test
       void shouldReturnListWithShoppingCart() {
-        assertThat( api.getShoppingCarts().get( 0 ).getId() ).isEqualTo( cartId );
+        assertThat( api.getShoppingCartById( cartId ).getId() ).isEqualTo( cartId );
       }
     }
 
@@ -80,7 +85,8 @@ public class ShoppingCartsApiTest {
     void setUp() {
       ordersApi = new OrdersApiImpl( new OrderRepositoryInMemory() );
       checkoutService = new CheckoutService( ordersApi );
-      api = new ShoppingCartsApiImpl( checkoutService, new ProductValidationService( productsApi ), new ShoppingCartRepositoryInMemory() );
+      api = new ShoppingCartsApiImpl( checkoutService, new ProductValidationService( productsApi ),
+                                      new ShoppingCartRepositoryInMemory() );
       cartId = api.createEmptyShoppingCart();
     }
 
@@ -121,7 +127,7 @@ public class ShoppingCartsApiTest {
 
       @Test
       void shouldThrow() {
-        assertThatThrownBy(()-> api.addItemToShoppingCart( cartId, item ));
+        assertThatThrownBy( () -> api.addItemToShoppingCart( cartId, item ) );
       }
     }
 
@@ -166,7 +172,7 @@ public class ShoppingCartsApiTest {
 
         @Test
         void cartShouldNoLongerExist() {
-          assertThat( api.getShoppingCarts() ).isEqualTo( Collections.emptyList() );
+          assertThatThrownBy( () -> api.getShoppingCartById( cartId ) );
         }
 
         @Test

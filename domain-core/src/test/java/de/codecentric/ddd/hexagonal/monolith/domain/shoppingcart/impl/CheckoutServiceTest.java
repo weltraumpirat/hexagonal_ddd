@@ -5,7 +5,7 @@ import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrderPosition;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrdersApi;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartItem;
-import de.codecentric.ddd.hexagonal.monolith.persistence.OrderRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.monolith.product.persistence.OrderRepositoryInMemory;
 import jdk.jfr.Description;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.joda.money.CurrencyUnit;

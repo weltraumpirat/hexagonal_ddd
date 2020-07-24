@@ -1,4 +1,4 @@
-package de.codecentric.ddd.hexagonal.monolith.persistence;
+package de.codecentric.ddd.hexagonal.monolith.product.persistence;
 
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrderRepository;

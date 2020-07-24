@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ShoppingCartsApi {
-  List<ShoppingCart> getShoppingCarts();
 
   UUID createEmptyShoppingCart();
 
@@ -15,4 +14,6 @@ public interface ShoppingCartsApi {
   void removeItemFromShoppingCart( final UUID cartId, final UUID itemId );
 
   void checkOut( final UUID cartId );
+
+  ShoppingCart getShoppingCartById( UUID cartId );
 }
