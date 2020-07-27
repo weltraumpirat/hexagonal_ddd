@@ -1,4 +1,9 @@
-import React, {ReactElement} from 'react'
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState
+} from 'react'
 import './App.css'
 import {
   Route,
@@ -11,6 +16,7 @@ import {
   ProductsApi
 } from '../api/products_api'
 import {Navigation} from './navigation/Navigation'
+import {Products} from './products/Products'
 import {Shopping} from './shopping/Shopping'
 import {ShoppingCart} from './shoppingcart/ShoppingCart'
 import {Orders} from './order/Orders'
@@ -24,7 +30,6 @@ import {
   OrdersApi
 } from '../api/orders_api'
 import {PackagingType} from './products/product'
-import {UUID} from '../types'
 
 export const ZERO: string = 'EUR 0.00'
 
@@ -47,107 +52,89 @@ const initProducts = async (): Promise<void> => {
 const ordersApi: OrdersApi = new OrdersApi()
 const shoppingCartApi = new ShoppingCartsApi()
 
-type AppState = {
-  products: ProductData[]
-  orders: OrderData[]
-  cart: UUID
-  items: ShoppingCartItemData[]
-  itemInfo: ShoppingCartItemsInfo
-  count: number
-  total: string
-  active: string
-}
+function App(): ReactElement {
+  const init: ProductData[] = []
+  const initCart: ShoppingCartItemData[] = []
+  const initOrders: OrderData[] = []
+  const [cart, setCart] = useState('')
+  const [products, setProducts] = useState(init)
+  const [items, setItems] = useState(initCart)
+  const [orders, setOrders] = useState(initOrders)
+  const [count, setCount] = useState(0)
+  const [total, setTotal] = useState(ZERO)
+  const [active, setActive] = useState('')
 
-const initialState: AppState = {
-  products: [],
-  orders: [],
-  cart: '',
-  items: [],
-  itemInfo: {items: [], count: 0, total: ZERO},
-  count: 0,
-  total: ZERO,
-  active: ''
-}
-
-export default class App extends React.Component<{}, AppState> {
-  constructor(props: {}) {
-    super(props)
-    this.state = initialState
-    this.handleNavigationSelect = this.handleNavigationSelect.bind(this)
-    this.handleCheckout = this.handleCheckout.bind(this)
-    this.handleItemAddedToCart = this.handleItemAddedToCart.bind(this)
-    this.handleItemRemovedFromCart = this.handleItemRemovedFromCart.bind(this)
-    this.updateAfterShoppingCartChange = this.updateAfterShoppingCartChange.bind(this)
-  }
-
-  componentDidMount(): void {
+  useEffect(() => {
     const fetch = async (): Promise<void> => {
       await initProducts()
-      const products: ProductData[] = await productsApi.getProducts()
-      const cart: UUID = await shoppingCartApi.createEmptyShoppingCart()
-      const orders: OrderData[] = await ordersApi.getOrders()
-      this.setState({products, cart, orders})
+      setProducts(await productsApi.getProducts())
+      setCart(await shoppingCartApi.createEmptyShoppingCart())
+      setOrders(await ordersApi.getOrders())
     }
     fetch()
-  }
+  }, [])
 
-  handleNavigationSelect({detail: {selected}}: Partial<CustomEvent>): void {
-    if (selected !== this.state.active) {
-      this.setState({active: selected}, async (): Promise<void> => {
-        const products: ProductData[] = selected === 'products' ? await productsApi.getProducts() : this.state.products
-        const orders: OrderData[] = selected === 'orders' ? await ordersApi.getOrders() : this.state.orders
-        this.setState({products, orders}, () => history.push(`/${selected}`))
-      })
-    }
-  }
+  const handleNavigationSelect = useCallback((ev: CustomEvent): void => {
+    setActive(ev.detail.selected)
+    history.push(`/${ev.detail.selected}`)
+  }, [])
 
-  async updateAfterShoppingCartChange(): Promise<void> {
-    const info: ShoppingCartItemsInfo = await shoppingCartApi.getShoppingCartItems(this.state.cart)
-    this.setState({...info})
-  }
+  const updateAfterShoppingCartChange = useCallback(async (): Promise<void> => {
+    const info: ShoppingCartItemsInfo = await shoppingCartApi.getShoppingCartItems(cart)
+    setItems(info.items)
+    setCount(info.count)
+    setTotal(info.total)
+  }, [cart])
 
-  async handleItemAddedToCart(item: ShoppingCartItemData): Promise<void> {
-    await shoppingCartApi.addItemToShoppingCart(this.state.cart, {...item})
-    await this.updateAfterShoppingCartChange()
-  }
+  const handleItemAddedToCart= useCallback(async  (item: ShoppingCartItemData): Promise<void> => {
+    await shoppingCartApi.addItemToShoppingCart(cart, {...item})
+    updateAfterShoppingCartChange()
+  }, [cart, updateAfterShoppingCartChange])
 
-  async handleItemRemovedFromCart(item: ShoppingCartItemData): Promise<void> {
-    await shoppingCartApi.removeItemFromShoppingCart(this.state.cart, {...item})
-    this.updateAfterShoppingCartChange()
-  }
+  const handleItemRemovedFromCart = useCallback(async (item: ShoppingCartItemData) : Promise<void> => {
+    await shoppingCartApi.removeItemFromShoppingCart(cart, {...item})
+    updateAfterShoppingCartChange()
+  }, [cart, updateAfterShoppingCartChange])
 
-  async handleCheckout(): Promise<void> {
-    await shoppingCartApi.checkOut(this.state.cart)
-    const cart: UUID = await shoppingCartApi.createEmptyShoppingCart()
-    this.setState({
-      cart,
-      items: [],
-      count: 0,
-      total: ZERO
-    }, () => this.handleNavigationSelect({detail: {selected: 'orders'}}))
-  }
+  const handleCheckout= useCallback(async () => {
+    await shoppingCartApi.checkOut(cart)
+    setOrders(await ordersApi.getOrders())
+    setCart(await shoppingCartApi.createEmptyShoppingCart())
+    setItems(initCart)
+    setCount(0)
+    setTotal(ZERO)
+    setActive('orders')
 
-  render(): ReactElement {
-    const {active, count, products, items, total, orders} = this.state
-    return (<div className="App">
-      <Router history={history}>
-        <Navigation selected={active} onSelect={this.handleNavigationSelect} shoppingCartItems={count}/>
-        <Switch>
-          <Route path="/shopping">
-            <Shopping
-                    availableProducts={products}
-                    onItemAddedToCart={this.handleItemAddedToCart}/>
-          </Route>
-          <Route path="/cart">
-            <ShoppingCart items={items} total={total} onCheckOut={this.handleCheckout}
-                    onItemRemovedFromCart={this.handleItemRemovedFromCart}/>
-          </Route>
-          <Route path="/orders">
-            <Orders orders={orders}/>
-          </Route>
-        </Switch>
-      </Router>
-    </div>)
-  }
+    history.push('/orders')
+  }, [cart, initCart])
+
+  const handleProductAdded = useCallback(async (p: ProductData): Promise<void> => {
+    await productsApi.addProduct(p)
+    setProducts(await productsApi.getProducts())
+  }, [])
+
+  return (<div className="App">
+    <Router history={history}>
+      <Navigation selected={active} onSelect={handleNavigationSelect} shoppingCartItems={count}/>
+      <Switch>
+        <Route path="/products">
+          <Products products={products} onProductAdded={handleProductAdded}/>
+        </Route>
+        <Route path="/shopping">
+          <Shopping
+                  availableProducts={products}
+                  onItemAddedToCart={handleItemAddedToCart}/>
+        </Route>
+        <Route path="/cart">
+          <ShoppingCart items={items} total={total} onCheckOut={handleCheckout}
+                  onItemRemovedFromCart={handleItemRemovedFromCart}/>
+        </Route>
+        <Route path="/orders">
+          <Orders orders={orders}/>
+        </Route>
+      </Switch>
+    </Router>
+  </div>)
 }
 
+export default App

@@ -1,4 +1,9 @@
-import React, {ReactElement} from 'react'
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState
+} from 'react'
 import './App.css'
 import {
   Route,
@@ -39,67 +44,46 @@ const initProducts = async (): Promise<void> => {
 
 const ordersApi: OrdersApi = new OrdersApi()
 
-type AppState = {
-  products: ProductData[]
-  orders: OrderData[]
-  active: string
-}
+function App(): ReactElement {
+  const init: ProductData[] = []
+  const initOrders: OrderData[] = []
+  const [products, setProducts] = useState(init)
+  const [orders, setOrders] = useState(initOrders)
+  const [active, setActive] = useState('')
 
-const initialState: AppState = {
-  products: [],
-  orders: [],
-  active: ''
-}
-
-export default class App extends React.Component<{}, AppState> {
-  constructor(props: {}) {
-    super(props)
-    this.state = initialState
-    this.handleNavigationSelect = this.handleNavigationSelect.bind(this)
-    this.handleProductAdded = this.handleProductAdded.bind(this)
-  }
-
-  componentDidMount(): void {
+  useEffect(() => {
     const fetch = async (): Promise<void> => {
       await initProducts()
-      const products: ProductData[] = await productsApi.getProducts()
-      const orders: OrderData[] = await ordersApi.getOrders()
-      this.setState({products, orders})
+      setProducts(await productsApi.getProducts())
+      setOrders(await ordersApi.getOrders())
     }
     fetch()
-  }
+  }, [])
 
-  handleNavigationSelect({detail: {selected}}: Partial<CustomEvent>): void {
-    console.log('handle')
-    if (selected !== this.state.active) {
-      this.setState({active: selected}, async (): Promise<void> => {
-        const products: ProductData[] = selected === 'products' ? await productsApi.getProducts() : this.state.products
-        const orders: OrderData[] = selected === 'orders' ? await ordersApi.getOrders() : this.state.orders
-        this.setState({products, orders}, () => history.push(`/${selected}`))
-      })
-    }
-  }
+  const handleNavigationSelect = useCallback((ev: CustomEvent): void => {
+    setActive(ev.detail.selected)
+    history.push(`/${ev.detail.selected}`)
+  }, [])
 
-  async handleProductAdded(p: ProductData) : Promise<void>{
+
+  const handleProductAdded = useCallback(async (p: ProductData): Promise<void> => {
     await productsApi.addProduct(p)
-    const products: ProductData[] = await productsApi.getProducts()
-    this.setState({products})
-  }
+    setProducts(await productsApi.getProducts())
+  }, [])
 
-  render(): ReactElement {
-    const {active, products, orders} = this.state
-    return (<div className="App">
-      <Router history={history}>
-        <Navigation selected={active} onSelect={this.handleNavigationSelect}/>
-        <Switch>
-          <Route path="/products">
-            <Products products={products} onProductAdded={this.handleProductAdded}/>
-          </Route>
-          <Route path="/orders">
-            <Orders orders={orders}/>
-          </Route>
-        </Switch>
-      </Router>
-    </div>)
-  }
+  return (<div className="App">
+    <Router history={history}>
+      <Navigation selected={active} onSelect={handleNavigationSelect}/>
+      <Switch>
+        <Route path="/products">
+          <Products products={products} onProductAdded={handleProductAdded}/>
+        </Route>
+        <Route path="/orders">
+          <Orders orders={orders}/>
+        </Route>
+      </Switch>
+    </Router>
+  </div>)
 }
+
+export default App
