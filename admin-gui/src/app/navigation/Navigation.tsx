@@ -15,6 +15,7 @@ export function Navigation(props: NavigationProps): ReactElement {
   return (<div className="Navigation">
     <WiredListBox horizontal selected={props.selected} bgColor="black" onSelect={props.onSelect}>
       <WiredItem value="products">Products</WiredItem>
+      <WiredItem value="shoppingcarts">Shopping Carts</WiredItem>
       <WiredItem value="orders">Orders</WiredItem>
     </WiredListBox>
   </div>)

@@ -23,6 +23,12 @@ import {
   OrdersApi
 } from '../api/orders_api'
 import {PackagingType} from '../api/product'
+import ShoppingCarts from './shoppingcarts/ShoppingCarts'
+import {UUID} from '../types'
+import {
+  ShoppingCartData,
+  ShoppingCartsApi
+} from '../api/shoppingcarts_api'
 
 export const ZERO: string = 'EUR 0.00'
 
@@ -42,27 +48,35 @@ const initProducts = async (): Promise<void> => {
   }
 }
 
-const ordersApi: OrdersApi = new OrdersApi()
+const ordersApi = new OrdersApi()
+const shoppingCartsApi = new ShoppingCartsApi()
 
 function App(): ReactElement {
   const init: ProductData[] = []
   const initOrders: OrderData[] = []
+  const initCarts: ShoppingCartData[] = []
   const [products, setProducts] = useState(init)
   const [orders, setOrders] = useState(initOrders)
   const [active, setActive] = useState('')
+  const [carts, setCarts] = useState(initCarts)
 
   useEffect(() => {
     const fetch = async (): Promise<void> => {
       await initProducts()
       setProducts(await productsApi.getProducts())
       setOrders(await ordersApi.getOrders())
+      setCarts( await shoppingCartsApi.getShoppingCarts())
     }
     fetch()
   }, [])
 
-  const handleNavigationSelect = useCallback((ev: CustomEvent): void => {
-    setActive(ev.detail.selected)
-    history.push(`/${ev.detail.selected}`)
+  const handleNavigationSelect = useCallback(async ({detail:{selected}}: CustomEvent): Promise<void> => {
+    setActive(selected)
+    if(selected === 'orders')
+      setOrders(await ordersApi.getOrders())
+    if(selected === 'shoppingcarts')
+      setCarts(await shoppingCartsApi.getShoppingCarts())
+    history.push(`/${selected}`)
   }, [])
 
 
@@ -71,12 +85,20 @@ function App(): ReactElement {
     setProducts(await productsApi.getProducts())
   }, [])
 
+  const handleCartDeleted = useCallback( async (cartId: UUID): Promise<void> => {
+    await shoppingCartsApi.delete(cartId)
+    setCarts( await shoppingCartsApi.getShoppingCarts())
+  }, [])
+
   return (<div className="App">
     <Router history={history}>
       <Navigation selected={active} onSelect={handleNavigationSelect}/>
       <Switch>
         <Route path="/products">
           <Products products={products} onProductAdded={handleProductAdded}/>
+        </Route>
+        <Route path="/shoppingcarts">
+          <ShoppingCarts carts={carts} onCartDeleted={handleCartDeleted}/>
         </Route>
         <Route path="/orders">
           <Orders orders={orders}/>

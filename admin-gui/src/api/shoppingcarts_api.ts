@@ -5,6 +5,8 @@ import {ZERO} from '../app/App'
 export interface ShoppingCartData {
   id: UUID
   items: ShoppingCartItemData[]
+  count: number
+  total: string
 }
 
 export interface ShoppingCartItemData {
@@ -50,11 +52,20 @@ export class ShoppingCartsApi {
   }
 
 
-  public async getShoppingCartItems(id: UUID): Promise<ShoppingCartItemsInfo> {
+  public async getShoppingCartItems(id: UUID): Promise<ShoppingCartData> {
     const items: ShoppingCartItemData[] = (await axios.get(`${ENDPOINT_CARTS}/${id}`)).data
     const count = items.length
     const total = totalPrice(items)
-    return {items, count, total}
+    return {id, items, count, total}
+  }
+
+  async delete(cartId: UUID): Promise<void> {
+    await axios.delete(`${ENDPOINT_CARTS}/${cartId}`)
+  }
+
+  async getShoppingCarts(): Promise<ShoppingCartData[]> {
+    return ((await axios.get(`${ENDPOINT_CARTS}`)).data as ShoppingCartData[])
+      .map(c => ({...c, count: c.items.length, total: totalPrice(c.items)}))
   }
 }
 

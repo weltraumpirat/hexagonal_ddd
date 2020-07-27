@@ -5,8 +5,10 @@ import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCar
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartRepository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ShoppingCartRepositoryInMemory implements ShoppingCartRepository {
   private final Map<UUID, ShoppingCart> carts = new HashMap<>();
@@ -14,6 +16,11 @@ public class ShoppingCartRepositoryInMemory implements ShoppingCartRepository {
 
   @Override public void create( final ShoppingCart cart ) {
     carts.put( cart.getId(), cart );
+  }
+
+  @Override public List<ShoppingCart> findAll( ) {
+    return carts.values().stream()
+             .collect( Collectors.toUnmodifiableList() );
   }
 
   @Override public ShoppingCart findById( final UUID cartId ) {

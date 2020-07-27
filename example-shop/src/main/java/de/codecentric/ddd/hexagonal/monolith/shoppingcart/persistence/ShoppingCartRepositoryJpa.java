@@ -7,14 +7,14 @@ import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCar
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartRepository;
 import org.joda.money.Money;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class ShoppingCartRepositoryJpa implements ShoppingCartRepository {
   private final ShoppingCartItemCrudRepository jpaItemsRepo;
-  private final ShoppingCartCrudRepository jpaCartsRepo;
+  private final ShoppingCartCrudRepository     jpaCartsRepo;
+
   public ShoppingCartRepositoryJpa(
     final ShoppingCartCrudRepository jpaCartsRepo,
     final ShoppingCartItemCrudRepository itemsRepo ) {
@@ -33,7 +33,7 @@ public class ShoppingCartRepositoryJpa implements ShoppingCartRepository {
 
   private void save( final ShoppingCart cart ) {
     final UUID cartId = cart.getId();
-    jpaCartsRepo.save(new ShoppingCartEntity( cartId ) );
+    jpaCartsRepo.save( new ShoppingCartEntity( cartId ) );
 
     final List<ShoppingCartItemEntity> entities = cart.getItems().stream()
                                                     .map( item -> itemToEntity( cartId, item ) )
@@ -53,7 +53,7 @@ public class ShoppingCartRepositoryJpa implements ShoppingCartRepository {
   }
 
   @Override public ShoppingCart findById( final UUID cartId ) {
-    if(jpaCartsRepo.existsById( cartId )) {
+    if( jpaCartsRepo.existsById( cartId ) ) {
       final Iterable<ShoppingCartItemEntity> entities = jpaItemsRepo.findByCartId( cartId );
       final List<ShoppingCartItem> items = StreamSupport.stream( entities.spliterator(), false )
                                              .map( e -> new ShoppingCartItem( e.getId(),
@@ -62,6 +62,20 @@ public class ShoppingCartRepositoryJpa implements ShoppingCartRepository {
                                              .collect( Collectors.toList() );
       return new ShoppingCart( cartId, items );
     } else throw new ShoppingCartNotFoundException();
+  }
+
+  @Override public List<ShoppingCart> findAll() {
+    Map<UUID, List<ShoppingCartItem>> items = new HashMap<>();
+    jpaItemsRepo.findAll().forEach( e->{
+      List<ShoppingCartItem> list = items.getOrDefault( e.getCartId(), new ArrayList<>() );
+      list.add(new ShoppingCartItem( e.getId(),
+                                     e.getLabel(),
+                                     toMoney( e.getPrice() ) ) );
+      items.put(e.getCartId(), list);
+    } );
+    return StreamSupport.stream( jpaCartsRepo.findAll().spliterator(), false )
+             .map( c -> new ShoppingCart( c.getId(), items.getOrDefault( c.getId(), Collections.emptyList() ) ) )
+             .collect( Collectors.toUnmodifiableList() );
   }
 
   @Override public void delete( final UUID cartId ) {
@@ -73,7 +87,7 @@ public class ShoppingCartRepositoryJpa implements ShoppingCartRepository {
     jpaCartsRepo.deleteById( cartId );
   }
 
-  public void deleteCartItems(final UUID cartId) {
+  public void deleteCartItems( final UUID cartId ) {
     jpaItemsRepo.deleteAllByCartId( cartId );
   }
 }

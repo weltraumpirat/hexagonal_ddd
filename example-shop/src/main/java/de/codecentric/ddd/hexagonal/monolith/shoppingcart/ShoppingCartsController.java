@@ -1,6 +1,7 @@
 package de.codecentric.ddd.hexagonal.monolith.shoppingcart;
 
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.ShoppingCartNotFoundException;
+import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCart;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartsApi;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,11 @@ public class ShoppingCartsController {
     this.api = api;
   }
 
+  @GetMapping( "/cart" )
+  public List<ShoppingCart> getCarts( ) {
+      return api.getShoppingCarts();
+  }
+
   @GetMapping( "/cart/{cartId}" )
   public List<ShoppingCartItem> getCartItems( @PathVariable final UUID cartId ) {
     try {
@@ -34,6 +40,16 @@ public class ShoppingCartsController {
   @PostMapping( "/cart" )
   public UUID createEmptyCart() {
     return api.createEmptyShoppingCart();
+  }
+
+  @DeleteMapping( "/cart/{cartId}" )
+  @Transactional
+  public void deleteCart( @PathVariable final UUID cartId ) {
+    try {
+      api.deleteCartById( cartId );
+    } catch( ShoppingCartNotFoundException e ) {
+      throw shoppingCartNotFoundResponse( cartId, e );
+    }
   }
 
   @PostMapping( "/cart/{cartId}" )

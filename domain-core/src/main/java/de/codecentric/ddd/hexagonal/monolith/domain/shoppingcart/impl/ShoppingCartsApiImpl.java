@@ -32,6 +32,10 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     return cart.getId();
   }
 
+  @Override public void deleteCartById( final UUID cartId ) {
+    repository.delete(cartId);
+  }
+
   @Override public void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem shoppingCartItem ) {
     productValidationService.validate( shoppingCartItem );
     final ShoppingCartEntity cart = ShoppingCartFactory.create( repository.findById( cartId ) );
@@ -49,6 +53,10 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     final ShoppingCartEntity cart = ShoppingCartFactory.create( repository.findById( cartId ) );
     checkoutService.checkOut( cart.getItems() );
     repository.delete( cartId );
+  }
+
+  @Override public List<ShoppingCart> getShoppingCarts( ) {
+    return repository.findAll();
   }
 
   @Override public List<ShoppingCartItem> getShoppingCartItems( final UUID cartId ) {

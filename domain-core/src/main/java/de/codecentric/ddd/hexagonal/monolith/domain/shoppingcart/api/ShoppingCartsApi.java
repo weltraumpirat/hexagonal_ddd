@@ -9,6 +9,8 @@ public interface ShoppingCartsApi {
 
   void addItemToShoppingCart(final UUID cartId,  final ShoppingCartItem shoppingCartItem );
 
+  List<ShoppingCart> getShoppingCarts();
+
   List<ShoppingCartItem> getShoppingCartItems(final UUID cartId );
 
   void removeItemFromShoppingCart( final UUID cartId, final UUID itemId );
@@ -16,4 +18,6 @@ public interface ShoppingCartsApi {
   void checkOut( final UUID cartId );
 
   ShoppingCart getShoppingCartById( UUID cartId );
+
+  void deleteCartById( UUID cartId );
 }
