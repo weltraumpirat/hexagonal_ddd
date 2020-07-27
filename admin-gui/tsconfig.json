@@ -1,0 +1,40 @@
+{
+  "include": [
+    "src/**/*",
+    "acceptance/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ],
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "types": [
+      "node",
+      "jest"
+    ],
+    "target": "es5",
+    "pretty": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "downlevelIteration": true,
+    "sourceMap": true,
+    "noEmit": true,
+    "strict": true,
+    "jsx": "react",
+    "forceConsistentCasingInFileNames": true
+  },
+  "compileOnSave": true
+}

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@CrossOrigin( origins = "http://localhost:3000" )
+@CrossOrigin(origins = {"http://localhost:3000","http://localhost:3001","http://localhost" })
 @RestController
 public class ProductController {
   private final ProductsApi productApi;

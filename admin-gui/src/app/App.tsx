@@ -11,20 +11,13 @@ import {
   ProductsApi
 } from '../api/products_api'
 import {Navigation} from './navigation/Navigation'
-import {Shopping} from './shopping/Shopping'
-import {ShoppingCart} from './shoppingcart/ShoppingCart'
+import {Products} from './products/Products'
 import {Orders} from './order/Orders'
-import {
-  ShoppingCartItemData,
-  ShoppingCartItemsInfo,
-  ShoppingCartsApi
-} from '../api/shoppingcarts_api'
 import {
   OrderData,
   OrdersApi
 } from '../api/orders_api'
 import {PackagingType} from './products/product'
-import {UUID} from '../types'
 
 export const ZERO: string = 'EUR 0.00'
 
@@ -45,27 +38,16 @@ const initProducts = async (): Promise<void> => {
 }
 
 const ordersApi: OrdersApi = new OrdersApi()
-const shoppingCartApi = new ShoppingCartsApi()
 
 type AppState = {
   products: ProductData[]
   orders: OrderData[]
-  cart: UUID
-  items: ShoppingCartItemData[]
-  itemInfo: ShoppingCartItemsInfo
-  count: number
-  total: string
   active: string
 }
 
 const initialState: AppState = {
   products: [],
   orders: [],
-  cart: '',
-  items: [],
-  itemInfo: {items: [], count: 0, total: ZERO},
-  count: 0,
-  total: ZERO,
   active: ''
 }
 
@@ -79,9 +61,8 @@ export default class App extends React.Component<{}, AppState> {
     const fetch = async (): Promise<void> => {
       await initProducts()
       const products: ProductData[] = await productsApi.getProducts()
-      const cart: UUID = await shoppingCartApi.createEmptyShoppingCart()
       const orders: OrderData[] = await ordersApi.getOrders()
-      this.setState({products, cart, orders})
+      this.setState({products, orders})
     }
     fetch()
   }
@@ -96,47 +77,20 @@ export default class App extends React.Component<{}, AppState> {
     }
   }
 
-  async updateAfterShoppingCartChange(): Promise<void> {
-    const info: ShoppingCartItemsInfo = await shoppingCartApi.getShoppingCartItems(this.state.cart)
-    this.setState({...info})
-  }
-
-  async handleItemAddedToCart(item: ShoppingCartItemData): Promise<void> {
-    await shoppingCartApi.addItemToShoppingCart(this.state.cart, {...item})
-    await this.updateAfterShoppingCartChange()
-  }
-
-  async handleItemRemovedFromCart(item: ShoppingCartItemData): Promise<void> {
-    console.log('handleItemRemovedFromCart')
-    await shoppingCartApi.removeItemFromShoppingCart(this.state.cart, {...item})
-    this.updateAfterShoppingCartChange()
-  }
-
-  async handleCheckout(): Promise<void> {
-    await shoppingCartApi.checkOut(this.state.cart)
-    const cart: UUID = await shoppingCartApi.createEmptyShoppingCart()
-    this.setState({
-      cart,
-      items: [],
-      count: 0,
-      total: ZERO
-    }, () => this.handleNavigationSelect({detail: {selected: 'orders'}}))
+  async handleProductAdded(p: ProductData) : Promise<void>{
+    await productsApi.addProduct(p)
+    const products: ProductData[] = await productsApi.getProducts()
+    this.setState({products})
   }
 
   render(): ReactElement {
-    const {active, count, products, items, total, orders} = this.state
+    const {active, products, orders} = this.state
     return (<div className="App">
       <Router history={history}>
-        <Navigation selected={active} onSelect={this.handleNavigationSelect.bind(this)} shoppingCartItems={count}/>
+        <Navigation selected={active} onSelect={this.handleNavigationSelect.bind(this)}/>
         <Switch>
-          <Route path="/shopping">
-            <Shopping
-                    availableProducts={products}
-                    onItemAddedToCart={this.handleItemAddedToCart.bind(this)}/>
-          </Route>
-          <Route path="/cart">
-            <ShoppingCart items={items} total={total} onCheckOut={this.handleCheckout.bind(this)}
-                    onItemRemovedFromCart={this.handleItemRemovedFromCart.bind(this)}/>
+          <Route path="/products">
+            <Products products={products} onProductAdded={this.handleProductAdded.bind(this)}/>
           </Route>
           <Route path="/orders">
             <Orders orders={orders}/>
@@ -146,4 +100,3 @@ export default class App extends React.Component<{}, AppState> {
     </div>)
   }
 }
-

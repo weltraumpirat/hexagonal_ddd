@@ -1,0 +1,4 @@
+registry=https://artifactory.codecentric.de/artifactory/api/npm/npm/
+_auth = ARTIFACTORY_TOKEN
+email = ARTIFACTORY_EMAIL
+always-auth = true
