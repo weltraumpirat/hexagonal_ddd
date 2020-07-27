@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@CrossOrigin( origins = "http://localhost:3000" )
 @RestController
 public class ProductController {
   private final ProductsApi productApi;
@@ -16,18 +17,24 @@ public class ProductController {
     this.productApi = productApi;
   }
 
-  @GetMapping("/product")
+  @GetMapping( "/product" )
   public List<Product> getProducts() {
     return productApi.getProducts().stream()
              .collect( Collectors.toUnmodifiableList() );
   }
 
-  @PostMapping("/product")
-  public void addProduct(@RequestBody final Product product ) {
-    productApi.addProduct( product );
+  @PostMapping( "/product" )
+  public void addProduct( @RequestBody final Product product ) {
+    final Product p =
+      new Product( product.getId() != null ? product.getId() : UUID.randomUUID(),
+                   product.getName(),
+                   product.getPackagingType(),
+                   product.getPrice(),
+                   product.getAmount() );
+    productApi.addProduct( p );
   }
 
-  @DeleteMapping("/product")
+  @DeleteMapping( "/product" )
   public void deleteProduct( final String id ) {
     productApi.removeProduct( UUID.fromString( id ) );
   }

@@ -6,6 +6,8 @@ import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.monolith.product.persistence.OrderRepositoryInMemory;
 import jdk.jfr.Description;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.joda.money.CurrencyUnit.EUR;
+import org.joda.money.Money;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -22,9 +24,10 @@ public class OrdersApiTest {
   @Description( "Given no orders have been taken" )
   public class GivenNoOrders {
     private OrdersApi api;
+
     @BeforeEach
     void setUp() {
-      api = new OrdersApiImpl( new OrderRepositoryInMemory());
+      api = new OrdersApiImpl( new OrderRepositoryInMemory() );
     }
 
     @Nested
@@ -34,14 +37,14 @@ public class OrdersApiTest {
 
       @BeforeEach
       void setUp() {
-        order = new Order( UUID, Collections.emptyList() );
+        order = new Order( UUID, Money.zero( EUR ), Collections.emptyList(), null );
         api.createOrder( order );
       }
 
       @Test
-      @Description("should return a list with the new order")
+      @Description( "should return a list with the new order" )
       void shouldReturnListWithNewOrder() {
-        assertThat(api.getOrders()).isEqualTo( Collections.singletonList( order ) );
+        assertThat( api.getOrders() ).isEqualTo( Collections.singletonList( order ) );
       }
     }
 

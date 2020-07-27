@@ -1,0 +1,12 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea
+*.iml
+
+yarn-error.log
+dist/**
+build/**
+node_modules
+src/**/*.js
+src/**/*.js.map
+acceptance/**/*.js
+acceptance/**/*.js.map

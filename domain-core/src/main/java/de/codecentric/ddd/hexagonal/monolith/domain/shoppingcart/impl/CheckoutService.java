@@ -4,13 +4,10 @@ import de.codecentric.ddd.hexagonal.monolith.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrderPosition;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrdersApi;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartItem;
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CheckoutService {
@@ -24,8 +21,16 @@ public class CheckoutService {
     if( items.size()>0 ) {
       final Map<String, OrderPosition> positions = new HashMap<>();
       items.forEach( ( item -> addOne( item, positions ) ) );
-      final Order order =
-        new Order( UUID.randomUUID(), positions.values().stream().sorted((o1, o2) -> o1.getItemName().compareToIgnoreCase( o2.getItemName() ) ).collect( Collectors.toUnmodifiableList() ) );
+      final List<OrderPosition> sortedPositions =
+        positions.values().stream()
+          .sorted( ( o1, o2 ) -> o1.getItemName().compareToIgnoreCase( o2.getItemName() ) )
+          .collect( Collectors.toUnmodifiableList() );
+
+      final Money total = sortedPositions.stream()
+                            .map( OrderPosition::getCombinedPrice )
+                            .reduce( ( Money price, Money acc) -> acc != null? acc.plus( price ): price )
+        .orElse( Money.zero( CurrencyUnit.EUR ) );
+      final Order order = new Order( UUID.randomUUID(), total, sortedPositions, null );
       ordersApi.createOrder( order );
     }
   }
@@ -40,6 +45,6 @@ public class CheckoutService {
   }
 
   private Money zeroPrice( final Money price ) {
-    return Money.of( price.getCurrencyUnit(), new BigDecimal( "0" ) );
+    return Money.zero( price.getCurrencyUnit());
   }
 }

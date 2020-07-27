@@ -15,6 +15,7 @@ import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCar
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.CheckoutService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ProductValidationService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ShoppingCartsApiImpl;
+import de.codecentric.ddd.hexagonal.monolith.order.persistence.OrderCrudRepository;
 import de.codecentric.ddd.hexagonal.monolith.order.persistence.OrderPositionCrudRepository;
 import de.codecentric.ddd.hexagonal.monolith.order.persistence.OrderRepositoryJpa;
 import de.codecentric.ddd.hexagonal.monolith.product.persistence.ProductCrudRepository;
@@ -35,8 +36,9 @@ public class ExampleShopConfig {
   }
 
   @Bean
-  OrdersApi createOrdersApi( @Autowired final OrderPositionCrudRepository crudRepository ) {
-    return new OrdersApiImpl( new OrderRepositoryJpa( crudRepository ) );
+  OrdersApi createOrdersApi( @Autowired final OrderCrudRepository orderRepository,
+                             @Autowired final OrderPositionCrudRepository positionsRepository ) {
+    return new OrdersApiImpl( new OrderRepositoryJpa( orderRepository, positionsRepository ) );
   }
 
   @Bean

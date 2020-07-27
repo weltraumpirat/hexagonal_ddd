@@ -1,0 +1,6 @@
+src/**/*.js
+src/**/*.map
+acceptance/**/*.js
+acceptance/**/*.map
+
+node_modules

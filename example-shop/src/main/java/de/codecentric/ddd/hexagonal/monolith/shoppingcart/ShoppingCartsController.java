@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Log
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class ShoppingCartsController {
   private final ShoppingCartsApi api;
@@ -40,9 +41,9 @@ public class ShoppingCartsController {
   @PostMapping( "/cart/{cartId}" )
   public void addItem( @PathVariable final UUID cartId, @RequestBody final ShoppingCartItem item ) {
     try {
-      api.addItemToShoppingCart( cartId, item );
+      final ShoppingCartItem itemToAdd = new ShoppingCartItem( item.getId() != null ? item.getId() : UUID.randomUUID(),item.getLabel(), item.getPrice() );
+      api.addItemToShoppingCart( cartId, itemToAdd );
     } catch( NoSuchElementException e ) {
-      e.printStackTrace();
       throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "The provided item is not a valid product." );
     } catch( ShoppingCartNotFoundException e ) {
       throw shoppingCartNotFoundResponse( cartId, e );

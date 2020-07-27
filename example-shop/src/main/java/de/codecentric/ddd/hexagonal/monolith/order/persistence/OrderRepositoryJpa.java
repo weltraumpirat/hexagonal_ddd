@@ -4,19 +4,27 @@ import static de.codecentric.ddd.hexagonal.monolith.config.json.MoneyMapper.toMo
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrderPosition;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrderRepository;
+import static java.util.stream.Collectors.*;
 import org.joda.money.Money;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class OrderRepositoryJpa implements OrderRepository {
-  private final OrderPositionCrudRepository jpaRepo;
+  public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+  private final OrderPositionCrudRepository jpaPositionsRepo;
+  private final OrderCrudRepository jpaOrderRepo;
 
-  public OrderRepositoryJpa( final OrderPositionCrudRepository jpaRepo ) {
-    this.jpaRepo = jpaRepo;
+  public OrderRepositoryJpa(
+    final OrderCrudRepository jpaOrderRepo,
+    final OrderPositionCrudRepository jpaPositionsRepo ) {
+    this.jpaOrderRepo = jpaOrderRepo;
+    this.jpaPositionsRepo = jpaPositionsRepo;
   }
 
   @Override public void create( final Order order ) {
+    jpaOrderRepo.save(new OrderEntity( order.getId(), order.getTotal().toString()));
     final List<OrderPositionEntity> entities = order.getPositions().stream().map( p -> {
       OrderPositionEntity entity = new OrderPositionEntity();
       entity.setId( p.getId() );
@@ -28,22 +36,25 @@ public class OrderRepositoryJpa implements OrderRepository {
       final Money combined = p.getCombinedPrice();
       entity.setCombinedPrice( combined.getCurrencyUnit()+" "+combined.getAmount().toString() );
       return entity;
-    } ).collect( Collectors.toList() );
-    jpaRepo.saveAll( entities );
+    } ).collect( toList() );
+    jpaPositionsRepo.saveAll( entities );
   }
 
   @Override public List<Order> findAll() {
-    Map<UUID, Order> orders = new HashMap<>();
-    jpaRepo.findAll().forEach( e -> {
+    final Map<UUID, List<OrderPosition>> orders = new HashMap<>();
+    jpaPositionsRepo.findAll().forEach( e -> {
       final UUID orderId = e.getOrderId();
-      final Order prev = orders.get( orderId );
-      final List<OrderPosition> positions = prev != null ? prev.getPositions() : new ArrayList<>();
-      positions.add( new OrderPosition( e.getId(), e.getItemName(), e.getCount(), toMoney( e.getSinglePrice() ),
-                                        toMoney( e.getCombinedPrice() ) ) );
-      final Order next = new Order( orderId, positions );
-      orders.put( orderId, next );
+      final Money price = toMoney( e.getSinglePrice() );
+      final Money combinedPrice = toMoney( e.getCombinedPrice() );
+
+      final List<OrderPosition> positions = orders.getOrDefault( orderId, new ArrayList<>() );
+      positions.add( new OrderPosition( e.getId(), e.getItemName(), e.getCount(), price, combinedPrice ) );
+      orders.put( orderId, positions );
     } );
-    return orders.values().stream()
-             .collect( Collectors.toUnmodifiableList() );
+
+    return StreamSupport.stream( jpaOrderRepo.findAll().spliterator(), false )
+                                       .map(o -> new Order( o.getId(), toMoney(o.getTotal()), orders.get(o.getId()),
+                                                            DATE_TIME_FORMATTER.format( o.getTimestamp() )) )
+                                       .collect(  toUnmodifiableList());
   }
 }

@@ -1,0 +1,37 @@
+{
+  "extends": [
+    "react-app"
+  ],
+  "rules": {
+    "@typescript-eslint/indent": ["warn", 2, {
+      "CallExpression": {"arguments": "first"},
+      "ignoredNodes": [
+        "JSXElement", "JSXElement > *", "JSXAttribute", "JSXIdentifier", "JSXNamespacedName", "JSXMemberExpression",
+        "JSXSpreadAttribute", "JSXExpressionContainer", "JSXOpeningElement", "JSXClosingElement", "JSXText",
+        "JSXEmptyExpression", "JSXSpreadChild"
+      ]
+    }
+    ],
+    "react/jsx-indent": ["warn", 2],
+    "@typescript-eslint/semi": ["warn", "never"],
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn", {
+        "allowExpressions": true,
+        "allowTypedFunctionExpressions": true,
+        "allowHigherOrderFunctions": true
+      }
+    ],
+    "@typescript-eslint/member-delimiter-style": [
+      "warn", {
+        "multiline": {
+          "delimiter": "none",
+          "requireLast": false
+        },
+        "singleline": {
+          "delimiter": "comma",
+          "requireLast": false
+        }
+      }
+    ]
+  }
+}
