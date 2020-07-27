@@ -17,7 +17,7 @@ import {
   OrderData,
   OrdersApi
 } from '../api/orders_api'
-import {PackagingType} from './products/product'
+import {PackagingType} from '../api/product'
 
 export const ZERO: string = 'EUR 0.00'
 
@@ -55,6 +55,8 @@ export default class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props)
     this.state = initialState
+    this.handleNavigationSelect = this.handleNavigationSelect.bind(this)
+    this.handleProductAdded = this.handleProductAdded.bind(this)
   }
 
   componentDidMount(): void {
@@ -68,6 +70,7 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   handleNavigationSelect({detail: {selected}}: Partial<CustomEvent>): void {
+    console.log('handle')
     if (selected !== this.state.active) {
       this.setState({active: selected}, async (): Promise<void> => {
         const products: ProductData[] = selected === 'products' ? await productsApi.getProducts() : this.state.products
@@ -87,10 +90,10 @@ export default class App extends React.Component<{}, AppState> {
     const {active, products, orders} = this.state
     return (<div className="App">
       <Router history={history}>
-        <Navigation selected={active} onSelect={this.handleNavigationSelect.bind(this)}/>
+        <Navigation selected={active} onSelect={this.handleNavigationSelect}/>
         <Switch>
           <Route path="/products">
-            <Products products={products} onProductAdded={this.handleProductAdded.bind(this)}/>
+            <Products products={products} onProductAdded={this.handleProductAdded}/>
           </Route>
           <Route path="/orders">
             <Orders orders={orders}/>

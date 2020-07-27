@@ -73,6 +73,11 @@ export default class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props)
     this.state = initialState
+    this.handleNavigationSelect = this.handleNavigationSelect.bind(this)
+    this.handleCheckout = this.handleCheckout.bind(this)
+    this.handleItemAddedToCart = this.handleItemAddedToCart.bind(this)
+    this.handleItemRemovedFromCart = this.handleItemRemovedFromCart.bind(this)
+    this.updateAfterShoppingCartChange = this.updateAfterShoppingCartChange.bind(this)
   }
 
   componentDidMount(): void {
@@ -107,7 +112,6 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   async handleItemRemovedFromCart(item: ShoppingCartItemData): Promise<void> {
-    console.log('handleItemRemovedFromCart')
     await shoppingCartApi.removeItemFromShoppingCart(this.state.cart, {...item})
     this.updateAfterShoppingCartChange()
   }
@@ -127,16 +131,16 @@ export default class App extends React.Component<{}, AppState> {
     const {active, count, products, items, total, orders} = this.state
     return (<div className="App">
       <Router history={history}>
-        <Navigation selected={active} onSelect={this.handleNavigationSelect.bind(this)} shoppingCartItems={count}/>
+        <Navigation selected={active} onSelect={this.handleNavigationSelect} shoppingCartItems={count}/>
         <Switch>
           <Route path="/shopping">
             <Shopping
                     availableProducts={products}
-                    onItemAddedToCart={this.handleItemAddedToCart.bind(this)}/>
+                    onItemAddedToCart={this.handleItemAddedToCart}/>
           </Route>
           <Route path="/cart">
-            <ShoppingCart items={items} total={total} onCheckOut={this.handleCheckout.bind(this)}
-                    onItemRemovedFromCart={this.handleItemRemovedFromCart.bind(this)}/>
+            <ShoppingCart items={items} total={total} onCheckOut={this.handleCheckout}
+                    onItemRemovedFromCart={this.handleItemRemovedFromCart}/>
           </Route>
           <Route path="/orders">
             <Orders orders={orders}/>

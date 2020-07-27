@@ -1,4 +1,4 @@
-import {PackagingType} from '../app/products/product'
+import {PackagingType} from './product'
 import axios from 'axios'
 
 export interface ProductData {

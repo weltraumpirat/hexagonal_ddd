@@ -11,7 +11,7 @@ import {
   WiredInput,
   WiredItem
 } from 'react-wired-elements'
-import {PackagingType} from './product'
+import {PackagingType} from '../../api/product'
 
 type AddProductDialogProps = { open: boolean, onCancel: () => void, onSubmit: (p: ProductData) => void }
 
