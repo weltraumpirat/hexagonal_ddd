@@ -11,3 +11,5 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 **/*.iml
 /docker/*.jar
+/docker/admin/**/*
+/docker/shop/**/*
