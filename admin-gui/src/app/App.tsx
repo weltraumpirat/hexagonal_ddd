@@ -32,7 +32,7 @@ import {
 
 export const ZERO: string = 'EUR 0.00'
 
-const history = createBrowserHistory()
+const history = createBrowserHistory({basename: '/admin'})
 const productsApi = new ProductsApi()
 const initProducts = async (): Promise<void> => {
   if ((await productsApi.getProducts()).length === 0) {

@@ -16,14 +16,41 @@ services:
   example-shop:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-server
       cache_from:
         - openjdk:13-jdk-alpine
     image: example-shop:latest
     container_name: example-shop
     environment:
       MYSQL_HOST: mysql
-    ports:
-      - 80:8080
     depends_on:
       - mysql
+  shop-gui:
+    build:
+      context: .
+      dockerfile: Dockerfile-shop
+      cache_from:
+        - nginx
+    image: shop-gui:latest
+    container_name: shop-gui
+  admin-gui:
+    build:
+      context: .
+      dockerfile: Dockerfile-admin
+      cache_from:
+        - nginx
+    image: admin-gui:latest
+    container_name: admin-gui
+  shop-lb:
+    build:
+      context: .
+      dockerfile: Dockerfile-lb
+      cache_from:
+        - nginx
+    image: shop-lb:latest
+    container_name: shop-lb
+    ports:
+      - 80:80
+    depends_on:
+      - example-shop
+      - shop-gui

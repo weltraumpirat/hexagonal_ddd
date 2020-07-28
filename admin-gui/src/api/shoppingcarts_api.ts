@@ -21,7 +21,7 @@ export interface ShoppingCartItemsInfo {
   total: string
 }
 
-const ENDPOINT_CARTS = 'http://localhost/cart'
+const ENDPOINT_CARTS = 'http://localhost/api/cart'
 
 function totalPrice(items: ShoppingCartItemData[]): string {
   if (items.length !== 0) {

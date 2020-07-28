@@ -18,7 +18,7 @@ export interface OrderPosition {
   combinedPrice: string
 }
 
-const ENDPOINT_ORDER: string = 'http://localhost/order'
+const ENDPOINT_ORDER: string = 'http://localhost/api/order'
 
 export class OrdersApi {
 

@@ -17,13 +17,13 @@ public class ProductController {
     this.productApi = productApi;
   }
 
-  @GetMapping( "/product" )
+  @GetMapping( "/api/product" )
   public List<Product> getProducts() {
     return productApi.getProducts().stream()
              .collect( Collectors.toUnmodifiableList() );
   }
 
-  @PostMapping( "/product" )
+  @PostMapping( "/api/product" )
   public void addProduct( @RequestBody final Product product ) {
     final Product p =
       new Product( product.getId() != null ? product.getId() : UUID.randomUUID(),
@@ -34,7 +34,7 @@ public class ProductController {
     productApi.addProduct( p );
   }
 
-  @DeleteMapping( "/product" )
+  @DeleteMapping( "/api/product" )
   public void deleteProduct( final String id ) {
     productApi.removeProduct( UUID.fromString( id ) );
   }

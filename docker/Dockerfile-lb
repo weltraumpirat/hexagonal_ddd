@@ -1,0 +1,5 @@
+FROM nginx
+
+COPY nginx-lb/nginx.conf /etc/nginx/nginx.conf
+
+COPY nginx-lb/cors_support /etc/nginx/cors_support

@@ -8,7 +8,7 @@ export interface ProductData {
   amount: string
   price: string
 }
-const ENDPOINT_PRODUCTS = "http://localhost/product"
+const ENDPOINT_PRODUCTS = "http://localhost/api/product"
 export class ProductsApi {
 
 

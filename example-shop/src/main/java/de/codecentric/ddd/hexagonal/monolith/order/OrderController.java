@@ -15,12 +15,12 @@ public class OrderController {
     this.api = api;
   }
 
-  @GetMapping( "/order" )
+  @GetMapping( "/api/order" )
   public List<Order> getOrders() {
     return api.getOrders();
   }
 
-  @PostMapping( "/order" )
+  @PostMapping( "/api/order" )
   public void postOrder( @RequestBody final Order order ) {
     api.createOrder( order );
   }

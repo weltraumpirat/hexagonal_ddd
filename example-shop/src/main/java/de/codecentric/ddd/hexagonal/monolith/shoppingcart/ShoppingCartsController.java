@@ -23,12 +23,12 @@ public class ShoppingCartsController {
     this.api = api;
   }
 
-  @GetMapping( "/cart" )
+  @GetMapping( "/api/cart" )
   public List<ShoppingCart> getCarts( ) {
       return api.getShoppingCarts();
   }
 
-  @GetMapping( "/cart/{cartId}" )
+  @GetMapping( "/api/cart/{cartId}" )
   public List<ShoppingCartItem> getCartItems( @PathVariable final UUID cartId ) {
     try {
       return api.getShoppingCartItems( cartId );
@@ -37,12 +37,12 @@ public class ShoppingCartsController {
     }
   }
 
-  @PostMapping( "/cart" )
+  @PostMapping( "/api/cart" )
   public UUID createEmptyCart() {
     return api.createEmptyShoppingCart();
   }
 
-  @DeleteMapping( "/cart/{cartId}" )
+  @DeleteMapping( "/api/cart/{cartId}" )
   @Transactional
   public void deleteCart( @PathVariable final UUID cartId ) {
     try {
@@ -52,7 +52,7 @@ public class ShoppingCartsController {
     }
   }
 
-  @PostMapping( "/cart/{cartId}" )
+  @PostMapping( "/api/cart/{cartId}" )
   public void addItem( @PathVariable final UUID cartId, @RequestBody final ShoppingCartItem item ) {
     try {
       final ShoppingCartItem itemToAdd = new ShoppingCartItem( item.getId() != null ? item.getId() : UUID.randomUUID(),item.getLabel(), item.getPrice() );
@@ -64,7 +64,7 @@ public class ShoppingCartsController {
     }
   }
 
-  @DeleteMapping( "/cart/{cartId}/{itemId}" )
+  @DeleteMapping( "/api/cart/{cartId}/{itemId}" )
   public void removeItem( @PathVariable final UUID cartId, @PathVariable UUID itemId ) {
     try {
       api.removeItemFromShoppingCart( cartId, itemId );
@@ -73,7 +73,7 @@ public class ShoppingCartsController {
     }
   }
 
-  @PostMapping( "/cart/{cartId}/checkout" )
+  @PostMapping( "/api/cart/{cartId}/checkout" )
   @Transactional
   public void checkOutShoppingCart( @PathVariable final UUID cartId ) {
     try {
