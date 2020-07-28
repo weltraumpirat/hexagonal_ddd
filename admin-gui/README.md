@@ -1,9 +1,9 @@
-# Domain Prototyping Showcase
-Powered by React, NodeJS, Cucumber and TypeScript.
+# Administration GUI for the shop application
+Powered by React, NodeJS, and TypeScript.
 
 `yarn install` -- should set everything up.
 
-`yarn test` -- should run both acceptance and unit tests.
+`yarn start` -- should run the app for testing and development purposes (localhost:3001)
 
-`yarn start` -- should run the demo react application
+`yarn build` -- should package the app for deployment
 
