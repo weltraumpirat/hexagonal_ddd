@@ -186,7 +186,7 @@ public class ShoppingCartsApiTest {
         @Test
         @Description( "a new empty cart should be created" )
         void anEmptyCartShouldBeCreated() {
-          assertThat( api.getShoppingCartById( newCartId ) ).isNotNull();
+          assertThat( api.getShoppingCarts().get(0).getId() ).isEqualTo(newCartId);
         }
       }
     }
