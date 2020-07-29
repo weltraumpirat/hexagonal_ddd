@@ -16,11 +16,35 @@ services:
   example-shop-order:
     build:
       context: .
-      dockerfile: Dockerfile-server
+      dockerfile: Dockerfile-server-order
       cache_from:
         - openjdk:13-jdk-alpine
     image: example-shop-order:latest
     container_name: example-shop-order
+    environment:
+      MYSQL_HOST: mysql
+    depends_on:
+      - mysql
+  example-shop-product:
+    build:
+      context: .
+      dockerfile: Dockerfile-server-product
+      cache_from:
+        - openjdk:13-jdk-alpine
+    image: example-shop-product:latest
+    container_name: example-shop-product
+    environment:
+      MYSQL_HOST: mysql
+    depends_on:
+      - mysql
+  example-shop-shoppingcart:
+    build:
+      context: .
+      dockerfile: Dockerfile-server-shoppingcart
+      cache_from:
+        - openjdk:13-jdk-alpine
+    image: example-shop-shoppingcart:latest
+    container_name: example-shop-shoppingcart
     environment:
       MYSQL_HOST: mysql
     depends_on:
@@ -53,4 +77,7 @@ services:
       - 80:80
     depends_on:
       - example-shop-order
+      - example-shop-product
+      - example-shop-shoppingcart
       - shop-gui
+      - admin-gui

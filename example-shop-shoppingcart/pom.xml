@@ -9,8 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>example-shop-order</artifactId>
-  <version>1.0</version>
+  <artifactId>example-shop-shoppingcart</artifactId>
   <build>
     <plugins>
       <plugin>

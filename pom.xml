@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <artifactId>hexagonal-ddd-example-monolith</artifactId>
+  <artifactId>hexagonal-ddd-example-shared</artifactId>
   <groupId>de.codecentric</groupId>
   <version>1.0</version>
 
@@ -22,6 +22,8 @@
   <modules>
     <module>domain-core</module>
     <module>example-shop-order</module>
+    <module>example-shop-product</module>
+    <module>example-shop-shoppingcart</module>
   </modules>
 
   <build>
