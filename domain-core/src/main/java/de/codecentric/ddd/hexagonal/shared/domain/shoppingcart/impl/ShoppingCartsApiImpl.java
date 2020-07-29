@@ -1,10 +1,7 @@
 package de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.impl;
 
 import de.codecentric.ddd.hexagonal.shared.domain.order.impl.OrdersCheckoutPolicyService;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCart;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartItem;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartRepository;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartsApi;
+import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.*;
 
 import java.util.ArrayList;
 import java.util.List;

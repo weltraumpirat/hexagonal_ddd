@@ -7,7 +7,7 @@ import static de.codecentric.ddd.hexagonal.shared.domain.product.api.Fluid.HALF_
 import de.codecentric.ddd.hexagonal.shared.domain.product.impl.ProductsApiImpl;
 import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartsApi;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.impl.ProductValidationService;
+import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.impl.ProductValidationServiceInMemory;
 import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.impl.ShoppingCartsApiImpl;
 import de.codecentric.ddd.hexagonal.shared.product.persistence.OrderRepositoryInMemory;
 import de.codecentric.ddd.hexagonal.shared.product.persistence.ProductRepositoryInMemory;
@@ -49,7 +49,7 @@ public class ShoppingCartsApiTest {
     void setUp() {
       ordersApi = new OrdersApiImpl( new OrderRepositoryInMemory() );
       ordersCheckoutPolicyService = new OrdersCheckoutPolicyService( ordersApi );
-      this.api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService, new ProductValidationService(
+      this.api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService, new ProductValidationServiceInMemory(
         productsApi ), new ShoppingCartRepositoryInMemory() );
     }
 
@@ -85,7 +85,7 @@ public class ShoppingCartsApiTest {
     void setUp() {
       ordersApi = new OrdersApiImpl( new OrderRepositoryInMemory() );
       ordersCheckoutPolicyService = new OrdersCheckoutPolicyService( ordersApi );
-      api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService, new ProductValidationService( productsApi ),
+      api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService, new ProductValidationServiceInMemory( productsApi ),
                                       new ShoppingCartRepositoryInMemory() );
       cartId = api.createEmptyShoppingCart();
     }
