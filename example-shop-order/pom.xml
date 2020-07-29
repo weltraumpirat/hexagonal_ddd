@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>example-shop</artifactId>
+  <artifactId>example-shop-order</artifactId>
   <version>1.0.1</version>
   <build>
     <plugins>
@@ -18,7 +18,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>2.3.0.RELEASE</version>
         <configuration>
-          <mainClass>de.codecentric.ddd.hexagonal.monolith.ExampleShopApplication</mainClass>
+          <mainClass>de.codecentric.ddd.hexagonal.shared.ExampleShopApplication</mainClass>
           <layout>ZIP</layout>
         </configuration>
       </plugin>

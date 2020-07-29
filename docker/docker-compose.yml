@@ -13,14 +13,14 @@ services:
       - 3306:3306
     volumes:
       - /var/lib/mysql
-  example-shop:
+  example-shop-order:
     build:
       context: .
       dockerfile: Dockerfile-server
       cache_from:
         - openjdk:13-jdk-alpine
-    image: example-shop:latest
-    container_name: example-shop
+    image: example-shop-order:latest
+    container_name: example-shop-order
     environment:
       MYSQL_HOST: mysql
     depends_on:
@@ -52,5 +52,5 @@ services:
     ports:
       - 80:80
     depends_on:
-      - example-shop
+      - example-shop-order
       - shop-gui

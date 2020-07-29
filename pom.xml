@@ -21,7 +21,7 @@
 
   <modules>
     <module>domain-core</module>
-    <module>example-shop</module>
+    <module>example-shop-order</module>
   </modules>
 
   <build>
