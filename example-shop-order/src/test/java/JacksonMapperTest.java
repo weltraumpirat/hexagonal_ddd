@@ -1,8 +1,8 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.codecentric.ddd.hexagonal.monolith.config.ExampleShopConfig;
-import static de.codecentric.ddd.hexagonal.monolith.domain.product.api.Fluid.HALF_LITRE;
-import de.codecentric.ddd.hexagonal.monolith.domain.product.api.PackagingType;
-import de.codecentric.ddd.hexagonal.monolith.domain.product.api.Product;
+import de.codecentric.ddd.hexagonal.shared.config.ExampleShopConfig;
+import static de.codecentric.ddd.hexagonal.shared.domain.product.api.Fluid.HALF_LITRE;
+import de.codecentric.ddd.hexagonal.shared.domain.product.api.PackagingType;
+import de.codecentric.ddd.hexagonal.shared.domain.product.api.Product;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
