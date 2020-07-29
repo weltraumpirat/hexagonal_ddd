@@ -75,9 +75,9 @@ public class ShoppingCartsController {
 
   @PostMapping( "/api/cart/{cartId}/checkout" )
   @Transactional
-  public void checkOutShoppingCart( @PathVariable final UUID cartId ) {
+  public UUID checkOutShoppingCart( @PathVariable final UUID cartId ) {
     try {
-      api.checkOut( cartId );
+      return api.checkOut( cartId );
     } catch( ShoppingCartNotFoundException e ) {
       throw shoppingCartNotFoundResponse( cartId, e );
     }

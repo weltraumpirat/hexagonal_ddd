@@ -12,7 +12,7 @@ import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.monolith.domain.product.api.ProductsApi;
 import de.codecentric.ddd.hexagonal.monolith.domain.product.impl.ProductsApiImpl;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartsApi;
-import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.CheckoutService;
+import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersCheckoutPolicyService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ProductValidationService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ShoppingCartsApiImpl;
 import de.codecentric.ddd.hexagonal.monolith.order.persistence.OrderCrudRepository;
@@ -46,7 +46,7 @@ public class ExampleShopConfig {
                                            @Autowired final ProductsApi productsApi,
                                            @Autowired final ShoppingCartCrudRepository cartRepository,
                                            @Autowired final ShoppingCartItemCrudRepository cartItemRepository ) {
-    return new ShoppingCartsApiImpl( new CheckoutService( ordersApi ),
+    return new ShoppingCartsApiImpl( new OrdersCheckoutPolicyService( ordersApi ),
                                      new ProductValidationService( productsApi ),
                                      new ShoppingCartRepositoryJpa( cartRepository, cartItemRepository ) );
   }

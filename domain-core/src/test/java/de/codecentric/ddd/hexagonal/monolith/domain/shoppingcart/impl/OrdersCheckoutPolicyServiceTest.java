@@ -3,6 +3,7 @@ package de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrderPosition;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrdersApi;
+import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersCheckoutPolicyService;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.monolith.product.persistence.OrderRepositoryInMemory;
@@ -20,14 +21,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-class CheckoutServiceTest {
-  private CheckoutService service;
-  private OrdersApi       ordersApi;
+class OrdersCheckoutPolicyServiceTest {
+  private OrdersCheckoutPolicyService service;
+  private OrdersApi                   ordersApi;
 
   @BeforeEach
   void setUp() {
     ordersApi = new OrdersApiImpl( new OrderRepositoryInMemory() );
-    service = new CheckoutService( ordersApi );
+    service = new OrdersCheckoutPolicyService( ordersApi );
   }
 
   @Nested
@@ -36,7 +37,7 @@ class CheckoutServiceTest {
     @Test
     @Description( "should not create an order" )
     void shouldNotCreateAnOrder() {
-      service.checkOut( Collections.emptyList() );
+      service.invoke( Collections.emptyList() );
       assertThat( ordersApi.getOrders() ).isEmpty();
     }
   }
@@ -48,7 +49,7 @@ class CheckoutServiceTest {
     @Description( "should create an order with one position" )
     void shouldCreateAnOrderWithOnePosition() {
       final Money singlePrice = Money.of( EUR, new BigDecimal( "1" ) );
-      service.checkOut( Collections.singletonList(
+      service.invoke( Collections.singletonList(
         new ShoppingCartItem( UUID.randomUUID(),
                               "Whole Milk, 0.5l Carton",
                               singlePrice ) ) );
@@ -71,7 +72,7 @@ class CheckoutServiceTest {
       final ShoppingCartItem item = new ShoppingCartItem( UUID.randomUUID(),
                                                                 "Whole Milk, 0.5l Carton",
                                                                 singlePrice );
-      service.checkOut( Arrays.asList( item, item ) );
+      service.invoke( Arrays.asList( item, item ) );
       final List<Order> orders = ordersApi.getOrders();
       assertThat( orders ).hasSize( 1 );
       final Order order = orders.get( 0 );
@@ -95,7 +96,7 @@ class CheckoutServiceTest {
       final ShoppingCartItem item2 = new ShoppingCartItem( UUID.randomUUID(),
                                                           "Whole Milk, 1l Carton",
                                                            singlePrice2);
-      service.checkOut( Arrays.asList( item, item2 ) );
+      service.invoke( Arrays.asList( item, item2 ) );
       final List<Order> orders = ordersApi.getOrders();
       assertThat( orders ).hasSize( 1 );
       final Order order = orders.get( 0 );

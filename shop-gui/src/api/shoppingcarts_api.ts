@@ -45,8 +45,8 @@ export class ShoppingCartsApi {
     await axios.delete(`${ENDPOINT_CARTS}/${cartId}/${item.id}`)
   }
 
-  public async checkOut(id: UUID): Promise<void> {
-    await axios.post(`${ENDPOINT_CARTS}/${id}/checkout`)
+  public async checkOut(id: UUID): Promise<UUID> {
+    return (await axios.post(`${ENDPOINT_CARTS}/${id}/checkout`)).data
   }
 
 

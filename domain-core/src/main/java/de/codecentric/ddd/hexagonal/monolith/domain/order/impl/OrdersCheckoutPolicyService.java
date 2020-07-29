@@ -1,4 +1,4 @@
-package de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl;
+package de.codecentric.ddd.hexagonal.monolith.domain.order.impl;
 
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrderPosition;
@@ -10,14 +10,14 @@ import org.joda.money.Money;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CheckoutService {
+public class OrdersCheckoutPolicyService {
   private final OrdersApi ordersApi;
 
-  public CheckoutService( final OrdersApi ordersApi ) {
+  public OrdersCheckoutPolicyService( final OrdersApi ordersApi ) {
     this.ordersApi = ordersApi;
   }
 
-  public void checkOut( List<ShoppingCartItem> items ) {
+  public void invoke( List<ShoppingCartItem> items ) {
     if( items.size()>0 ) {
       final Map<String, OrderPosition> positions = new HashMap<>();
       items.forEach( ( item -> addOne( item, positions ) ) );

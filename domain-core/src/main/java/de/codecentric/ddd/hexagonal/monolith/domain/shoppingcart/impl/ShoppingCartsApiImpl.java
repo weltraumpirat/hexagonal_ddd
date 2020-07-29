@@ -1,5 +1,6 @@
 package de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl;
 
+import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersCheckoutPolicyService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCart;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartRepository;
@@ -10,16 +11,18 @@ import java.util.List;
 import java.util.UUID;
 
 public class ShoppingCartsApiImpl implements ShoppingCartsApi {
-  private final ProductValidationService productValidationService;
-  private final ShoppingCartRepository   repository;
-  private final CheckoutService          checkoutService;
+  private final OrdersCheckoutPolicyService        ordersCheckoutPolicyService;
+  private final ShoppingCartsCheckoutPolicyService shoppingCartsCheckoutPolicyService;
+  private final ProductValidationService           productValidationService;
+  private final ShoppingCartRepository             repository;
 
-  public ShoppingCartsApiImpl( final CheckoutService checkoutService,
+  public ShoppingCartsApiImpl( final OrdersCheckoutPolicyService ordersCheckoutPolicyService,
                                final ProductValidationService productValidationService,
                                final ShoppingCartRepository repository ) {
-    this.checkoutService = checkoutService;
+    this.ordersCheckoutPolicyService = ordersCheckoutPolicyService;
     this.productValidationService = productValidationService;
     this.repository = repository;
+    this.shoppingCartsCheckoutPolicyService = new ShoppingCartsCheckoutPolicyService( this );
   }
 
   @Override public ShoppingCart getShoppingCartById( final UUID cartId ) {
@@ -33,7 +36,7 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
   }
 
   @Override public void deleteCartById( final UUID cartId ) {
-    repository.delete(cartId);
+    repository.delete( cartId );
   }
 
   @Override public void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem shoppingCartItem ) {
@@ -49,13 +52,13 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     repository.update( ShoppingCartFactory.create( cart ) );
   }
 
-  @Override public void checkOut( final UUID cartId ) {
+  @Override public UUID checkOut( final UUID cartId ) {
     final ShoppingCartEntity cart = ShoppingCartFactory.create( repository.findById( cartId ) );
-    checkoutService.checkOut( cart.getItems() );
-    repository.delete( cartId );
+    ordersCheckoutPolicyService.invoke( cart.getItems() );
+    return shoppingCartsCheckoutPolicyService.invoke( cartId );
   }
 
-  @Override public List<ShoppingCart> getShoppingCarts( ) {
+  @Override public List<ShoppingCart> getShoppingCarts() {
     return repository.findAll();
   }
 

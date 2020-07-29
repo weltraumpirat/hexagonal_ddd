@@ -2,11 +2,11 @@ package de.codecentric.ddd.hexagonal.monolith.domain.product.api;
 
 import de.codecentric.ddd.hexagonal.monolith.domain.order.api.OrdersApi;
 import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersApiImpl;
+import de.codecentric.ddd.hexagonal.monolith.domain.order.impl.OrdersCheckoutPolicyService;
 import static de.codecentric.ddd.hexagonal.monolith.domain.product.api.Fluid.HALF_LITRE;
 import de.codecentric.ddd.hexagonal.monolith.domain.product.impl.ProductsApiImpl;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.api.ShoppingCartsApi;
-import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.CheckoutService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ProductValidationService;
 import de.codecentric.ddd.hexagonal.monolith.domain.shoppingcart.impl.ShoppingCartsApiImpl;
 import de.codecentric.ddd.hexagonal.monolith.product.persistence.OrderRepositoryInMemory;
@@ -28,10 +28,10 @@ import java.util.UUID;
 
 public class ShoppingCartsApiTest {
 
-  public static final UUID            ITEM_ID = UUID.randomUUID();
-  private             OrdersApi       ordersApi;
-  private             CheckoutService checkoutService;
-  private             ProductsApiImpl productsApi;
+  public static final UUID                               ITEM_ID = UUID.randomUUID();
+  private             OrdersApi                          ordersApi;
+  private             OrdersCheckoutPolicyService        ordersCheckoutPolicyService;
+  private ProductsApiImpl             productsApi;
 
   @BeforeEach
   void setUp() {
@@ -48,8 +48,8 @@ public class ShoppingCartsApiTest {
     @BeforeEach
     void setUp() {
       ordersApi = new OrdersApiImpl( new OrderRepositoryInMemory() );
-      checkoutService = new CheckoutService( ordersApi );
-      this.api = new ShoppingCartsApiImpl( checkoutService, new ProductValidationService(
+      ordersCheckoutPolicyService = new OrdersCheckoutPolicyService( ordersApi );
+      this.api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService, new ProductValidationService(
         productsApi ), new ShoppingCartRepositoryInMemory() );
     }
 
@@ -84,8 +84,8 @@ public class ShoppingCartsApiTest {
     @BeforeEach
     void setUp() {
       ordersApi = new OrdersApiImpl( new OrderRepositoryInMemory() );
-      checkoutService = new CheckoutService( ordersApi );
-      api = new ShoppingCartsApiImpl( checkoutService, new ProductValidationService( productsApi ),
+      ordersCheckoutPolicyService = new OrdersCheckoutPolicyService( ordersApi );
+      api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService, new ProductValidationService( productsApi ),
                                       new ShoppingCartRepositoryInMemory() );
       cartId = api.createEmptyShoppingCart();
     }
@@ -164,20 +164,29 @@ public class ShoppingCartsApiTest {
       @Nested
       @Description( "when the cart is checked out" )
       class WhenTheCartIsCheckedOut {
+        private UUID newCartId;
 
         @BeforeEach
         void setUp() {
-          api.checkOut( cartId );
+          newCartId = api.checkOut( cartId );
         }
 
         @Test
+        @Description( "the cart should no longer exist" )
         void cartShouldNoLongerExist() {
           assertThatThrownBy( () -> api.getShoppingCartById( cartId ) );
         }
 
         @Test
+        @Description( "an order should be created" )
         void anOrderShouldBeCreated() {
           assertThat( ordersApi.getOrders() ).isNotEqualTo( Collections.emptyList() );
+        }
+
+        @Test
+        @Description( "a new empty cart should be created" )
+        void anEmptyCartShouldBeCreated() {
+          assertThat( api.getShoppingCartById( newCartId ) ).isNotNull();
         }
       }
     }

@@ -97,9 +97,8 @@ function App(): ReactElement {
   }, [cart, updateAfterShoppingCartChange])
 
   const handleCheckout= useCallback(async () => {
-    await shoppingCartApi.checkOut(cart)
+    setCart(await shoppingCartApi.checkOut(cart))
     setOrders(await ordersApi.getOrders())
-    setCart(await shoppingCartApi.createEmptyShoppingCart())
     setItems(initCart)
     setCount(0)
     setTotal(ZERO)

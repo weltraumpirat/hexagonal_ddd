@@ -15,7 +15,7 @@ public interface ShoppingCartsApi {
 
   void removeItemFromShoppingCart( final UUID cartId, final UUID itemId );
 
-  void checkOut( final UUID cartId );
+  UUID checkOut( final UUID cartId );
 
   ShoppingCart getShoppingCartById( UUID cartId );
 
