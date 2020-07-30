@@ -1,6 +1,6 @@
 package de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.impl;
 
-import de.codecentric.ddd.hexagonal.shared.domain.order.impl.OrdersCheckoutPolicyService;
+import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.OrdersCheckoutPolicyService;
 import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.*;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     this.ordersCheckoutPolicyService = ordersCheckoutPolicyService;
     this.productValidationService = productValidationService;
     this.repository = repository;
-    this.shoppingCartsCheckoutPolicyService = new ShoppingCartsCheckoutPolicyService( this );
+    this.shoppingCartsCheckoutPolicyService = new ShoppingCartsCheckoutPolicyServiceInMemory( this );
   }
 
   @Override public ShoppingCart getShoppingCartById( final UUID cartId ) {

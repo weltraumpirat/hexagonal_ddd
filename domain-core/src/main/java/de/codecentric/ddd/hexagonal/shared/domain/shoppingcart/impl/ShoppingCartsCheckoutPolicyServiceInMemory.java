@@ -1,18 +1,19 @@
 package de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.impl;
 
 import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartsApi;
+import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartsCheckoutPolicyService;
 
 import java.util.UUID;
 
-public class ShoppingCartsCheckoutPolicyService {
+public class ShoppingCartsCheckoutPolicyServiceInMemory implements ShoppingCartsCheckoutPolicyService {
   private final ShoppingCartsApi api;
 
-  public ShoppingCartsCheckoutPolicyService(
+  public ShoppingCartsCheckoutPolicyServiceInMemory(
     final ShoppingCartsApi api ) {
     this.api = api;
   }
 
-  public UUID invoke(final UUID cartId) {
+  @Override public UUID invoke( final UUID cartId ) {
     api.deleteCartById( cartId );
     return api.createEmptyShoppingCart();
   }

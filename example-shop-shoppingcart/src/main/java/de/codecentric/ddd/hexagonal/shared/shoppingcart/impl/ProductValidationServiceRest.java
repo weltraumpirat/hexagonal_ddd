@@ -16,7 +16,7 @@ public class ProductValidationServiceRest implements ProductValidationService {
   }
 
   @Override public void validate( final ShoppingCartItem shoppingCartItem ) {
-    final Product[] result = Optional.ofNullable( template.getForObject( "/product", Product[].class )
+    final Product[] result = Optional.ofNullable( template.getForObject( "http://example-shop-product:8080/api/product", Product[].class )
                                                 ).orElse( new Product[]{} );
     Arrays.stream( result )
       .filter( p -> shoppingCartItem.getLabel().equals( p.toLabel() ) )

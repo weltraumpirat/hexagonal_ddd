@@ -3,7 +3,7 @@ package de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.impl;
 import de.codecentric.ddd.hexagonal.shared.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.shared.domain.order.api.OrderPosition;
 import de.codecentric.ddd.hexagonal.shared.domain.order.api.OrdersApi;
-import de.codecentric.ddd.hexagonal.shared.domain.order.impl.OrdersCheckoutPolicyService;
+import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.OrdersCheckoutPolicyService;
 import de.codecentric.ddd.hexagonal.shared.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.shared.product.persistence.OrderRepositoryInMemory;
@@ -28,7 +28,7 @@ class OrdersCheckoutPolicyServiceTest {
   @BeforeEach
   void setUp() {
     ordersApi = new OrdersApiImpl( new OrderRepositoryInMemory() );
-    service = new OrdersCheckoutPolicyService( ordersApi );
+    service = new OrdersCheckoutPolicyServiceInMemory( ordersApi );
   }
 
   @Nested

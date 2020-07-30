@@ -1,23 +1,27 @@
-package de.codecentric.ddd.hexagonal.shared.domain.order.impl;
+package de.codecentric.ddd.hexagonal.shared.shoppingcart.impl;
 
 import de.codecentric.ddd.hexagonal.shared.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.shared.domain.order.api.OrderPosition;
-import de.codecentric.ddd.hexagonal.shared.domain.order.api.OrdersApi;
+import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.OrdersCheckoutPolicyService;
 import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartItem;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class OrdersCheckoutPolicyService {
-  private final OrdersApi ordersApi;
+public class OrdersCheckoutPolicyServiceRest implements OrdersCheckoutPolicyService {
+  private final RestTemplate template;
 
-  public OrdersCheckoutPolicyService( final OrdersApi ordersApi ) {
-    this.ordersApi = ordersApi;
+  public OrdersCheckoutPolicyServiceRest( final RestTemplate template ) {
+    this.template = template;
   }
 
-  public void invoke( List<ShoppingCartItem> items ) {
+  @Override public void invoke( List<ShoppingCartItem> items ) {
     if( items.size()>0 ) {
       final Map<String, OrderPosition> positions = new HashMap<>();
       items.forEach( ( item -> addOne( item, positions ) ) );
@@ -29,9 +33,9 @@ public class OrdersCheckoutPolicyService {
       final Money total = sortedPositions.stream()
                             .map( OrderPosition::getCombinedPrice )
                             .reduce( ( Money price, Money acc) -> acc != null? acc.plus( price ): price )
-        .orElse( Money.zero( CurrencyUnit.EUR ) );
+                            .orElse( Money.zero( CurrencyUnit.EUR ) );
       final Order order = new Order( UUID.randomUUID(), total, sortedPositions, null );
-      ordersApi.createOrder( order );
+      template.postForObject( "http://example-shop-order:8080/api/order", order, Order.class);
     }
   }
 

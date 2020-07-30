@@ -17,7 +17,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>2.3.0.RELEASE</version>
         <configuration>
-          <mainClass>de.codecentric.ddd.hexagonal.shared.ExampleShopApplication</mainClass>
+          <mainClass>de.codecentric.ddd.hexagonal.shared.ExampleShopShoppingCartApplication</mainClass>
           <layout>ZIP</layout>
         </configuration>
       </plugin>

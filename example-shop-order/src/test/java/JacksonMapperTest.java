@@ -1,5 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.codecentric.ddd.hexagonal.shared.config.ExampleShopConfig;
+import de.codecentric.ddd.hexagonal.shared.config.ExampleShopOrderConfig;
 import static de.codecentric.ddd.hexagonal.shared.domain.product.api.Fluid.HALF_LITRE;
 import de.codecentric.ddd.hexagonal.shared.domain.product.api.PackagingType;
 import de.codecentric.ddd.hexagonal.shared.domain.product.api.Product;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class JacksonMapperTest {
-  public static final ObjectMapper MAPPER = ExampleShopConfig.createObjectMapper();
+  public static final ObjectMapper MAPPER = ExampleShopOrderConfig.createObjectMapper();
 
   public static final Product PRODUCT    = new Product(
     UUID.fromString( "572e35e4-7be4-4c4a-bc49-32acd9aa09bc" ),

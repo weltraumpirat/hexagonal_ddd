@@ -1,16 +1,16 @@
 package de.codecentric.ddd.hexagonal.shared;
 
-import de.codecentric.ddd.hexagonal.shared.config.ExampleShopConfig;
+import de.codecentric.ddd.hexagonal.shared.config.ExampleShopOrderConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import({ ExampleShopConfig.class })
+@Import({ ExampleShopOrderConfig.class })
 
-public class ExampleShopApplication {
+public class ExampleShopOrderApplication {
 
   public static void main( String[] args ) {
-    SpringApplication.run( ExampleShopApplication.class, args );
+    SpringApplication.run( ExampleShopOrderApplication.class, args );
   }
 }
