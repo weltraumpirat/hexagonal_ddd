@@ -1,8 +1,8 @@
 version: '3.8'
 services:
-  mysql:
+  mysql-shoppingcart:
     image: mysql:5.6.36
-    container_name: example-shop-db
+    container_name: example-shop-shoppingcart-db
     environment:
       MYSQL_DATABASE: example_shop_db
       MYSQL_PASSWORD: eL,jW+6le7Q0mvR,
@@ -11,6 +11,32 @@ services:
     stdin_open: true
     ports:
       - 3306:3306
+    volumes:
+      - /var/lib/mysql
+  mysql-order:
+    image: mysql:5.6.36
+    container_name: example-shop-order-db
+    environment:
+      MYSQL_DATABASE: example_shop_db
+      MYSQL_PASSWORD: eL,jW+6le7Q0mvR,
+      MYSQL_ROOT_PASSWORD: b/:QQk^vnOWL71O.
+      MYSQL_USER: shop
+    stdin_open: true
+    ports:
+      - 3307:3306
+    volumes:
+      - /var/lib/mysql
+  mysql-product:
+    image: mysql:5.6.36
+    container_name: example-shop-product-db
+    environment:
+      MYSQL_DATABASE: example_shop_db
+      MYSQL_PASSWORD: eL,jW+6le7Q0mvR,
+      MYSQL_ROOT_PASSWORD: b/:QQk^vnOWL71O.
+      MYSQL_USER: shop
+    stdin_open: true
+    ports:
+      - 3308:3306
     volumes:
       - /var/lib/mysql
   example-shop-order:
@@ -22,9 +48,9 @@ services:
     image: example-shop-order:latest
     container_name: example-shop-order
     environment:
-      MYSQL_HOST: mysql
+      MYSQL_HOST: example-shop-order-db
     depends_on:
-      - mysql
+      - mysql-order
   example-shop-product:
     build:
       context: .
@@ -34,9 +60,9 @@ services:
     image: example-shop-product:latest
     container_name: example-shop-product
     environment:
-      MYSQL_HOST: mysql
+      MYSQL_HOST: example-shop-product-db
     depends_on:
-      - mysql
+      - mysql-product
   example-shop-shoppingcart:
     build:
       context: .
@@ -46,9 +72,9 @@ services:
     image: example-shop-shoppingcart:latest
     container_name: example-shop-shoppingcart
     environment:
-      MYSQL_HOST: mysql
+      MYSQL_HOST: example-shop-shoppingcart-db
     depends_on:
-      - mysql
+      - mysql-shoppingcart
   shop-gui:
     build:
       context: .
