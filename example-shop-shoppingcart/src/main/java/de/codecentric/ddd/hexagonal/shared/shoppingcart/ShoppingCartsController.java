@@ -1,9 +1,9 @@
 package de.codecentric.ddd.hexagonal.shared.shoppingcart;
 
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.ShoppingCartNotFoundException;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCart;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartItem;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartsApi;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCart;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartNotFoundException;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,7 +24,7 @@ public class ShoppingCartsController {
   }
 
   @GetMapping( "/api/cart" )
-  public List<ShoppingCart> getCarts( ) {
+  public List<ShoppingCart> getCarts() {
       return api.getShoppingCarts();
   }
 

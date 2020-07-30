@@ -3,7 +3,7 @@ package de.codecentric.ddd.hexagonal.shared.config.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Weight;
+import de.codecentric.ddd.hexagonal.domain.product.api.Weight;
 
 import java.io.IOException;
 

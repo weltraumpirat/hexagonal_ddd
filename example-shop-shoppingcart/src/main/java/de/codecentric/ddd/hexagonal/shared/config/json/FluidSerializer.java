@@ -3,7 +3,7 @@ package de.codecentric.ddd.hexagonal.shared.config.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Fluid;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.Fluid;
 
 import java.io.IOException;
 

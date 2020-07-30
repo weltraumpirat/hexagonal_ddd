@@ -1,10 +1,11 @@
 package de.codecentric.ddd.hexagonal.shared.order.persistence;
 
+import de.codecentric.ddd.hexagonal.domain.order.api.Order;
+import de.codecentric.ddd.hexagonal.domain.order.api.OrderPosition;
+import de.codecentric.ddd.hexagonal.domain.order.api.OrderRepository;
 import static de.codecentric.ddd.hexagonal.shared.config.json.MoneyMapper.toMoney;
-import de.codecentric.ddd.hexagonal.shared.domain.order.api.Order;
-import de.codecentric.ddd.hexagonal.shared.domain.order.api.OrderPosition;
-import de.codecentric.ddd.hexagonal.shared.domain.order.api.OrderRepository;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toUnmodifiableList;
 import org.joda.money.Money;
 
 import java.time.format.DateTimeFormatter;

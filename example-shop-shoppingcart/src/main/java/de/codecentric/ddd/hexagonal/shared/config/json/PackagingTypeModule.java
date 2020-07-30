@@ -1,7 +1,7 @@
 package de.codecentric.ddd.hexagonal.shared.config.json;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.PackagingType;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.PackagingType;
 
 public class PackagingTypeModule extends SimpleModule {
   public PackagingTypeModule() {

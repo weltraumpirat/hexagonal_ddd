@@ -1,8 +1,8 @@
 package de.codecentric.ddd.hexagonal.shared.config.json;
 
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Amount;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Fluid;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Weight;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.Amount;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.Fluid;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.Weight;
 
 public class AmountMapper {
   public static Amount toAmount( final String amount ) {

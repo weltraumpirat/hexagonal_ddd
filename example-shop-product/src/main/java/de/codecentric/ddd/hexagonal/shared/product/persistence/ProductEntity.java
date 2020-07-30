@@ -1,6 +1,6 @@
 package de.codecentric.ddd.hexagonal.shared.product.persistence;
 
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.PackagingType;
+import de.codecentric.ddd.hexagonal.domain.product.api.PackagingType;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -17,7 +17,7 @@ public class ProductEntity {
   @Column(length=24)
   private PackagingType packagingType;
   @Column( length=20)
-  private String         price;
+  private String        price;
   @Column( length=10)
   private String        amount;
 }

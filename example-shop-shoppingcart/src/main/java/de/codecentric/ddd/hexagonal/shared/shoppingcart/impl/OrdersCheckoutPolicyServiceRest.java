@@ -1,9 +1,7 @@
 package de.codecentric.ddd.hexagonal.shared.shoppingcart.impl;
 
-import de.codecentric.ddd.hexagonal.shared.domain.order.api.Order;
-import de.codecentric.ddd.hexagonal.shared.domain.order.api.OrderPosition;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.OrdersCheckoutPolicyService;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartItem;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.OrdersCheckoutPolicyService;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.springframework.web.client.RestTemplate;

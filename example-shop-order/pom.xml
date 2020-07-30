@@ -28,7 +28,7 @@
   <dependencies>
     <dependency>
       <groupId>de.codecentric</groupId>
-      <artifactId>domain-core</artifactId>
+      <artifactId>domain-core-order</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>

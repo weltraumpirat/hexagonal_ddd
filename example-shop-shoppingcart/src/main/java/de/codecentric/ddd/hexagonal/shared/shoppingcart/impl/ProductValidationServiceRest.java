@@ -1,8 +1,7 @@
 package de.codecentric.ddd.hexagonal.shared.shoppingcart.impl;
 
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Product;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ProductValidationService;
-import de.codecentric.ddd.hexagonal.shared.domain.shoppingcart.api.ShoppingCartItem;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ProductValidationService;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;

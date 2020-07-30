@@ -1,7 +1,7 @@
 package de.codecentric.ddd.hexagonal.shared.product;
 
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Product;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.ProductsApi;
+import de.codecentric.ddd.hexagonal.domain.product.api.Product;
+import de.codecentric.ddd.hexagonal.domain.product.api.ProductsApi;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package de.codecentric.ddd.hexagonal.shared.order;
 
-import de.codecentric.ddd.hexagonal.shared.domain.order.api.Order;
-import de.codecentric.ddd.hexagonal.shared.domain.order.api.OrdersApi;
+import de.codecentric.ddd.hexagonal.domain.order.api.Order;
+import de.codecentric.ddd.hexagonal.domain.order.api.OrdersApi;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

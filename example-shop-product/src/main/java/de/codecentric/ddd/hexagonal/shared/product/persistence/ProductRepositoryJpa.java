@@ -1,9 +1,9 @@
 package de.codecentric.ddd.hexagonal.shared.product.persistence;
 
+import de.codecentric.ddd.hexagonal.domain.product.api.Product;
+import de.codecentric.ddd.hexagonal.domain.product.api.ProductRepository;
 import static de.codecentric.ddd.hexagonal.shared.config.json.AmountMapper.toAmount;
 import static de.codecentric.ddd.hexagonal.shared.config.json.MoneyMapper.toMoney;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Product;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.ProductRepository;
 import org.joda.money.Money;
 
 import java.util.List;

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import de.codecentric.ddd.hexagonal.domain.order.api.Amount;
 import static de.codecentric.ddd.hexagonal.shared.config.json.AmountMapper.toAmount;
-import de.codecentric.ddd.hexagonal.shared.domain.product.api.Amount;
 
 import java.io.IOException;
 
