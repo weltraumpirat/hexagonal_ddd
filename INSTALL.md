@@ -22,9 +22,11 @@ Should run all Maven and Yarn builds, create all the necessary Docker images and
 ```shell script
 mvn clean install
 ```   
-2\. Copy the compiled jar into the `docker folder`
+2\. Copy the compiled jars into the `docker folder`
 ```shell script
-cp example-shop/target/example-shop-*.jar docker/
+cp example-shop-order/target/example-shop-*.jar docker/
+cp example-shop-product/target/example-shop-*.jar docker/
+cp example-shop-shoppingcart/target/example-shop-*.jar docker/
 ```
 3\. Change into the `shop-gui` folder
 ```shell script
