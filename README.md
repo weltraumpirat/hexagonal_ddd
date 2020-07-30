@@ -45,13 +45,13 @@ It is extremely naive, of course - only one user, and one administrator, no secu
 There are branches that contain the different implementations, and they are named:
 - **1_monolith**: \
 The most straightforward example, containing a single backend server and the two frontend apps.
---- 
-####COMING SOON:
-
 - **2_shared_kernel**: \
 The same application, but with "microservices", or rather, a few small services that share the same business logic as a library, as well as the database. _Warning:_ This is not an approach I would recommend as a target architecture, but rather the "step in between" a monolith and actual microservices, when you are aiming to transition to a distributed system.
 - **3_microservices** \
 Same partitioning as 2, but this time without shared anything, and the domain core properly split into several libraries.
+--- 
+####COMING SOON:
+
 - **4_cqrs** \
 Further separated commands and queries into individual services. This example shows how Ports and Adapters can also apply at network level, rather than in micro architecture.
 - **5_event_sourcing** \
