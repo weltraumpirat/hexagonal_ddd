@@ -2,14 +2,10 @@ package de.codecentric.ddd.hexagonal.domain.product.api;
 
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductsApiImpl;
 import de.codecentric.ddd.hexagonal.product.persistence.ProductRepositoryInMemory;
-import jdk.jfr.Description;
 import org.assertj.core.api.Assertions;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -20,7 +16,7 @@ class ProductsApiTest {
   private             ProductsApi api;
 
   @Nested
-  @Description( "Given an empty product list" )
+  @DisplayName( "Given an empty product list" )
   class GivenAnEmptyProductList {
     @BeforeEach
     void setUp() {
@@ -28,7 +24,7 @@ class ProductsApiTest {
     }
 
     @Nested
-    @Description( "when a product is added" )
+    @DisplayName( "when a product is added" )
     class WhenAProductIsAdded {
 
       private Product product;
@@ -45,7 +41,7 @@ class ProductsApiTest {
       }
 
       @Test
-      @Description( "should contain a product" )
+      @DisplayName( "should contain a product" )
       void shouldAddAProduct() {
         Assertions.assertThat( api.getProducts() )
           .isEqualTo( Collections.singletonList( product ) );
@@ -54,7 +50,7 @@ class ProductsApiTest {
   }
 
   @Nested
-  @Description( "Given one product in the list" )
+  @DisplayName( "Given one product in the list" )
   class GivenOneProductInTheList {
 
     @BeforeEach
@@ -69,7 +65,7 @@ class ProductsApiTest {
     }
 
     @Nested
-    @Description( "when the product is removed" )
+    @DisplayName( "when the product is removed" )
     class WhenTheProductIsRemoved {
       @BeforeEach
       void setUp() {
@@ -78,7 +74,7 @@ class ProductsApiTest {
       }
 
       @Test
-      @Description( "should return an empty product list" )
+      @DisplayName( "should return an empty product list" )
       void shouldReturnEmptyList() {
         Assertions.assertThat( api.getProducts() )
           .isEqualTo( Collections.emptyList() );

@@ -6,15 +6,11 @@ import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsApi;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartsApiImpl;
 import de.codecentric.ddd.hexagonal.shoppingcart.persistence.ShoppingCartRepositoryInMemory;
-import jdk.jfr.Description;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -35,7 +31,7 @@ public class ShoppingCartsApiTest {
   }
 
   @Nested
-  @Description( "Given no prior shoppingcarts" )
+  @DisplayName( "Given no prior shoppingcarts" )
   class GivenNoShoppingCarts {
     private ShoppingCartsApi api;
 
@@ -46,7 +42,7 @@ public class ShoppingCartsApiTest {
     }
 
     @Nested
-    @Description( "when an empty shopping cart is created" )
+    @DisplayName( "when an empty shopping cart is created" )
     class WhenEmptyShoppingCartIsCreated {
       private UUID cartId;
 
@@ -68,7 +64,7 @@ public class ShoppingCartsApiTest {
   }
 
   @Nested
-  @Description( "Given an existing shopping cart" )
+  @DisplayName( "Given an existing shopping cart" )
   class GivenAnExistingShoppingCart {
     private ShoppingCartsApi api;
     private UUID             cartId;
@@ -83,7 +79,7 @@ public class ShoppingCartsApiTest {
     }
 
     @Nested
-    @Description( "when a valid item is added" )
+    @DisplayName( "when a valid item is added" )
     class WhenAValidItemIsAdded {
 
       private ShoppingCartItem item;
@@ -104,7 +100,7 @@ public class ShoppingCartsApiTest {
     }
 
     @Nested
-    @Description( "when an invalid item is added" )
+    @DisplayName( "when an invalid item is added" )
     class WhenAnInvalidItemIsAdded {
 
       private ShoppingCartItem item;
@@ -125,7 +121,7 @@ public class ShoppingCartsApiTest {
     }
 
     @Nested
-    @Description( "and it contains an item" )
+    @DisplayName( "and it contains an item" )
     class AndAnItemExists {
 
       private ShoppingCartItem item;
@@ -140,7 +136,7 @@ public class ShoppingCartsApiTest {
       }
 
       @Nested
-      @Description( "when the item is removed" )
+      @DisplayName( "when the item is removed" )
       class WhenTheItemIsRemoved {
 
         @BeforeEach
@@ -155,7 +151,7 @@ public class ShoppingCartsApiTest {
       }
 
       @Nested
-      @Description( "when the cart is checked out" )
+      @DisplayName( "when the cart is checked out" )
       class WhenTheCartIsCheckedOut {
         private UUID newCartId;
 
@@ -165,19 +161,19 @@ public class ShoppingCartsApiTest {
         }
 
         @Test
-        @Description( "the cart should no longer exist" )
+        @DisplayName( "the cart should no longer exist" )
         void cartShouldNoLongerExist() {
           assertThatThrownBy( () -> api.getShoppingCartById( cartId ) );
         }
 
         @Test
-        @Description( "an order should be created" )
+        @DisplayName( "an order should be created" )
         void anOrderShouldBeCreated() {
           verify( ordersCheckoutPolicyService, times( 1 ) ).invoke( Collections.singletonList( item ) );
         }
 
         @Test
-        @Description( "a new empty cart should be created" )
+        @DisplayName( "a new empty cart should be created" )
         void anEmptyCartShouldBeCreated() {
           assertThat( api.getShoppingCarts().get( 0 ).getId() ).isEqualTo( newCartId );
         }

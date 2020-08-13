@@ -2,14 +2,10 @@ package de.codecentric.ddd.hexagonal.domain.order.api;
 
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.order.persistence.OrderRepositoryInMemory;
-import jdk.jfr.Description;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.money.CurrencyUnit.EUR;
 import org.joda.money.Money;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -19,7 +15,7 @@ public class OrdersApiTest {
   public static final UUID UUID = java.util.UUID.fromString( "572e35e4-7be4-4c4a-bc49-32acd9aa09bc" );
 
   @Nested
-  @Description( "Given no orders have been taken" )
+  @DisplayName( "Given no orders have been taken" )
   public class GivenNoOrders {
     private OrdersApi api;
 
@@ -29,7 +25,7 @@ public class OrdersApiTest {
     }
 
     @Nested
-    @Description( "when an order is created" )
+    @DisplayName( "when an order is created" )
     class WhenAnOrderIsCreated {
       private Order order;
 
@@ -40,7 +36,7 @@ public class OrdersApiTest {
       }
 
       @Test
-      @Description( "should return a list with the new order" )
+      @DisplayName( "should return a list with the new order" )
       void shouldReturnListWithNewOrder() {
         assertThat( api.getOrders() ).isEqualTo( Collections.singletonList( order ) );
       }
