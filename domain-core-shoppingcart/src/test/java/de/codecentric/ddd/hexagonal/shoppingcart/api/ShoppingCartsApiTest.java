@@ -4,6 +4,7 @@ import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.OrdersCheckoutPolicy
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ProductValidationService;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsApi;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartListReadModel;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartsApiImpl;
 import de.codecentric.ddd.hexagonal.shoppingcart.persistence.ShoppingCartRepositoryInMemory;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,8 +38,10 @@ public class ShoppingCartsApiTest {
 
     @BeforeEach
     void setUp() {
-      this.api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService, validationService,
-                                           new ShoppingCartRepositoryInMemory() );
+      this.api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService,
+                                           validationService,
+                                           new ShoppingCartRepositoryInMemory(),
+                                           new ShoppingCartListReadModel() );
     }
 
     @Nested
@@ -74,7 +77,8 @@ public class ShoppingCartsApiTest {
       ordersCheckoutPolicyService = mock( OrdersCheckoutPolicyService.class );
       api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService,
                                       validationService,
-                                      new ShoppingCartRepositoryInMemory() );
+                                      new ShoppingCartRepositoryInMemory(),
+                                      new ShoppingCartListReadModel() );
       cartId = api.createEmptyShoppingCart();
     }
 
@@ -107,7 +111,7 @@ public class ShoppingCartsApiTest {
 
       @BeforeEach
       void setUp() {
-        doThrow(NoSuchElementException.class).when(validationService).validate( any(ShoppingCartItem.class) );
+        doThrow( NoSuchElementException.class ).when( validationService ).validate( any( ShoppingCartItem.class ) );
         final Money singlePrice = Money.of( CurrencyUnit.of( "EUR" ), new BigDecimal( "1" ) );
         item = new ShoppingCartItem( ITEM_ID,
                                      "Unknown product label",
