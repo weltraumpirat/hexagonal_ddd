@@ -1,8 +1,5 @@
 import React, {ReactElement} from 'react'
-import {
-  ShoppingCartData,
-  ShoppingCartItemData
-} from '../../api/shoppingcarts_api'
+import {ShoppingCartData} from '../../api/shoppingcarts_api'
 import {UUID} from '../../types'
 import {
   WiredCard,
@@ -16,7 +13,6 @@ type ShoppingCartProps = {
 
 type ShoppingCartTableRowProps = {
   id: UUID
-  items: ShoppingCartItemData[]
   count: number
   total: string
   onCartDeleted: (cartId: UUID) => void

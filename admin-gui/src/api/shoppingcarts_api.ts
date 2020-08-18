@@ -1,10 +1,8 @@
 import {UUID} from '../types'
 import axios from 'axios'
-import {ZERO} from '../app/App'
 
 export interface ShoppingCartData {
   id: UUID
-  items: ShoppingCartItemData[]
   count: number
   total: string
 }
@@ -15,23 +13,7 @@ export interface ShoppingCartItemData {
   price: string
 }
 
-export interface ShoppingCartItemsInfo {
-  items: ShoppingCartItemData[]
-  count: number
-  total: string
-}
-
 const ENDPOINT_CARTS = 'http://localhost/api/cart'
-
-function totalPrice(items: ShoppingCartItemData[]): string {
-  if (items.length !== 0) {
-    return items
-      .map(({price}) => Money.fromString(price))
-      .reduce((total, price) => total.plus(price), Money.fromString(ZERO))
-      .toString()
-  }
-  return ZERO
-}
 
 export class ShoppingCartsApi {
 
@@ -51,48 +33,12 @@ export class ShoppingCartsApi {
     await axios.post(`${ENDPOINT_CARTS}/${id}/checkout`)
   }
 
-
-  public async getShoppingCartItems(id: UUID): Promise<ShoppingCartData> {
-    const items: ShoppingCartItemData[] = (await axios.get(`${ENDPOINT_CARTS}/${id}`)).data
-    const count = items.length
-    const total = totalPrice(items)
-    return {id, items, count, total}
-  }
-
   async delete(cartId: UUID): Promise<void> {
     await axios.delete(`${ENDPOINT_CARTS}/${cartId}`)
   }
 
   async getShoppingCarts(): Promise<ShoppingCartData[]> {
     return ((await axios.get(`${ENDPOINT_CARTS}`)).data as ShoppingCartData[])
-      .map(c => ({...c, count: c.items.length, total: totalPrice(c.items)}))
   }
 }
 
-type Currency = string
-type Amount = string
-
-class Money {
-  public readonly currency: Currency
-  public readonly amount: Amount
-
-  public constructor(currency: Currency, amount: Amount) {
-    this.currency = currency
-    this.amount = amount
-  }
-
-  public plus(money: Money): Money {
-    return new Money(this.currency, (parseFloat(this.amount) + parseFloat(money.amount)).toFixed(2))
-  }
-
-  public toString(): string {
-    return this.currency + Money.separator + this.amount
-  }
-
-  static readonly separator: string = ' '
-
-  static fromString(price: string): Money {
-    const [currency, amount]: string[] = price.split(Money.separator)
-    return new Money(currency as Currency, amount as Amount)
-  }
-}

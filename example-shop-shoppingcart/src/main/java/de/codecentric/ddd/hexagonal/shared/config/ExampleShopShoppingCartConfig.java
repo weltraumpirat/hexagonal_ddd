@@ -5,6 +5,7 @@ import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsApi;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartListReadModel;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartsApiImpl;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.MoneyModule;
@@ -34,7 +35,7 @@ public class ExampleShopShoppingCartConfig {
                                            @Autowired final ShoppingCartItemCrudRepository cartItemRepository ) {
     return new ShoppingCartsApiImpl( new OrdersCheckoutPolicyServiceRest( restTemplate ),
                                      new ProductValidationServiceRest( restTemplate ),
-                                     new ShoppingCartRepositoryJpa( cartRepository, cartItemRepository ) );
+                                     new ShoppingCartRepositoryJpa( cartRepository, cartItemRepository ), new ShoppingCartListReadModel() );
   }
 
   @Bean

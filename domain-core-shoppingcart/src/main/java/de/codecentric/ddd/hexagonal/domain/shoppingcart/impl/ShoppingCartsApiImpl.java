@@ -64,7 +64,7 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     return shoppingCartsCheckoutPolicyService.invoke( cartId );
   }
 
-  @Override public List<ShoppingCart> getShoppingCarts() {
+  @Override public List<ShoppingCartListRow> getShoppingCarts() {
     return shoppingCartListReadModel.read();
   }
 
