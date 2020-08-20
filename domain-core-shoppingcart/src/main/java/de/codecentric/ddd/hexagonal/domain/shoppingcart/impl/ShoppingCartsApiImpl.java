@@ -40,12 +40,15 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
   }
 
   @Override public void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem item ) {
-    final UUID uuid = item.getId() != null ? item.getId() : UUID.randomUUID();
-    final ShoppingCartItem itemToAdd = new ShoppingCartItem( uuid, item.getLabel(), item.getPrice() );
+    final ShoppingCartItem itemToAdd = create( item );
     productValidationService.validate( itemToAdd );
     final ShoppingCartEntity cartEntity = ShoppingCartFactory.create( repository.findById( cartId ) );
     cartEntity.addItem( itemToAdd );
     update( cartEntity );
+  }
+
+  public ShoppingCartItem create( final ShoppingCartItem item ) {
+    return ShoppingCartItemFactory.create(item);
   }
 
   private void update( final ShoppingCartEntity cartEntity ) {
@@ -74,3 +77,4 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     return repository.findById( cartId ).getItems();
   }
 }
+
