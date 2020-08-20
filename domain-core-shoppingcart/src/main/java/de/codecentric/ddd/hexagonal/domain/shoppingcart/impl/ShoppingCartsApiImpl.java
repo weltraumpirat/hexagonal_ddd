@@ -11,15 +11,18 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
   private final ProductValidationService           productValidationService;
   private final ShoppingCartRepository             repository;
   private final ShoppingCartListReadModel          shoppingCartListReadModel;
+  private final ShoppingCartItemsReadModel         shoppingCartItemsReadModel;
 
   public ShoppingCartsApiImpl( final OrdersCheckoutPolicyService ordersCheckoutPolicyService,
                                final ProductValidationService productValidationService,
                                final ShoppingCartRepository repository,
-                               final ShoppingCartListReadModel shoppingCartListReadModel ) {
+                               final ShoppingCartListReadModel shoppingCartListReadModel,
+                               final ShoppingCartItemsReadModel shoppingCartItemsReadModel ) {
     this.ordersCheckoutPolicyService = ordersCheckoutPolicyService;
     this.productValidationService = productValidationService;
     this.repository = repository;
     this.shoppingCartListReadModel = shoppingCartListReadModel;
+    this.shoppingCartItemsReadModel = shoppingCartItemsReadModel;
     this.shoppingCartsCheckoutPolicyService = new ShoppingCartsCheckoutPolicyServiceInMemory( this );
   }
 
@@ -27,12 +30,14 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     ShoppingCart cart = ShoppingCartFactory.create();
     repository.create( cart );
     shoppingCartListReadModel.handleCartCreated( cart );
+    shoppingCartItemsReadModel.handleCartCreated( cart );
     return cart.getId();
   }
 
   @Override public void deleteCartById( final UUID cartId ) {
     repository.delete( cartId );
     shoppingCartListReadModel.handleCartDeleted( cartId );
+    shoppingCartItemsReadModel.handleCartDeleted( cartId );
   }
 
   @Override public void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem item ) {
@@ -47,6 +52,7 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     final ShoppingCart cart = ShoppingCartFactory.create( cartEntity );
     repository.update( cart );
     shoppingCartListReadModel.handleCartUpdated( cart );
+    shoppingCartItemsReadModel.handleCartUpdated( cart );
   }
 
   @Override public void removeItemFromShoppingCart( final UUID cartId, final UUID itemId ) {
@@ -70,7 +76,7 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
   }
 
   @Override public List<ShoppingCartItem> getShoppingCartItems( final UUID cartId ) {
-    return repository.findById( cartId ).getItems();
+    return shoppingCartItemsReadModel.read( cartId );
   }
 }
 

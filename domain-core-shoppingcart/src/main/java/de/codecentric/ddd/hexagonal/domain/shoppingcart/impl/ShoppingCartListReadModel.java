@@ -32,11 +32,14 @@ public class ShoppingCartListReadModel {
   public void handleCartUpdated( final ShoppingCart cart ) {
     shoppingCarts.put( cart.getId(), rowFromCart( cart ) );
   }
-  private ShoppingCartListRow rowFromCart( final ShoppingCart cart) {
-   final Money total = cart.getItems().stream()
-                         .map( ShoppingCartItem::getPrice )
-                         .reduce( ( final Money price, final Money sum)-> sum.plus( price ) )
-                         .orElse( Money.zero( CurrencyUnit.EUR) );
-    return new ShoppingCartListRow( cart.getId(), cart.getItems().size(), total.getCurrencyUnit()+" "+total.getAmount());
+
+  private ShoppingCartListRow rowFromCart( final ShoppingCart cart ) {
+    final Money total = cart.getItems().stream()
+                          .map( ShoppingCartItem::getPrice )
+                          .reduce( ( final Money price, final Money sum ) -> sum.plus( price ) )
+                          .orElse( Money.zero( CurrencyUnit.EUR ) );
+    return new ShoppingCartListRow( cart.getId(),
+                                    cart.getItems().size(),
+                                    total.getCurrencyUnit()+" "+total.getAmount() );
   }
 }

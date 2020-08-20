@@ -4,6 +4,7 @@ import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.OrdersCheckoutPolicy
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ProductValidationService;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsApi;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartItemsReadModel;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartListReadModel;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartsApiImpl;
 import de.codecentric.ddd.hexagonal.shoppingcart.persistence.ShoppingCartRepositoryInMemory;
@@ -41,7 +42,8 @@ public class ShoppingCartsApiTest {
       this.api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService,
                                            validationService,
                                            new ShoppingCartRepositoryInMemory(),
-                                           new ShoppingCartListReadModel() );
+                                           new ShoppingCartListReadModel(),
+                                           new ShoppingCartItemsReadModel() );
     }
 
     @Nested
@@ -56,7 +58,7 @@ public class ShoppingCartsApiTest {
 
       @Test
       void shouldReturnListWithShoppingCart() {
-        assertThat( api.getShoppingCarts().get(0).getId() ).isEqualTo( cartId );
+        assertThat( api.getShoppingCarts().get( 0 ).getId() ).isEqualTo( cartId );
       }
     }
 
@@ -78,7 +80,8 @@ public class ShoppingCartsApiTest {
       api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService,
                                       validationService,
                                       new ShoppingCartRepositoryInMemory(),
-                                      new ShoppingCartListReadModel() );
+                                      new ShoppingCartListReadModel(),
+                                      new ShoppingCartItemsReadModel() );
       cartId = api.createEmptyShoppingCart();
     }
 
@@ -167,7 +170,8 @@ public class ShoppingCartsApiTest {
         @Test
         @DisplayName( "the cart should no longer exist" )
         void cartShouldNoLongerExist() {
-         assertThat(api.getShoppingCarts( ).stream().filter(cart -> cart.getId().equals( cartId) ).count()).isEqualTo(0);
+          assertThat( api.getShoppingCarts().stream().filter( cart -> cart.getId().equals( cartId ) ).count() )
+            .isEqualTo( 0 );
         }
 
         @Test
