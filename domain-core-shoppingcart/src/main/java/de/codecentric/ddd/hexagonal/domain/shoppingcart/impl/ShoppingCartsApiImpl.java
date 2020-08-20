@@ -23,10 +23,6 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     this.shoppingCartsCheckoutPolicyService = new ShoppingCartsCheckoutPolicyServiceInMemory( this );
   }
 
-  @Override public ShoppingCart getShoppingCartById( final UUID cartId ) {
-    return repository.findById( cartId );
-  }
-
   @Override public UUID createEmptyShoppingCart() {
     ShoppingCart cart = ShoppingCartFactory.create();
     repository.create( cart );
@@ -40,15 +36,11 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
   }
 
   @Override public void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem item ) {
-    final ShoppingCartItem itemToAdd = create( item );
+    final ShoppingCartItem itemToAdd = ShoppingCartItemFactory.create( item );
     productValidationService.validate( itemToAdd );
-    final ShoppingCartEntity cartEntity = ShoppingCartFactory.create( repository.findById( cartId ) );
+    final ShoppingCartEntity cartEntity = getShoppingCartById( cartId );
     cartEntity.addItem( itemToAdd );
     update( cartEntity );
-  }
-
-  public ShoppingCartItem create( final ShoppingCartItem item ) {
-    return ShoppingCartItemFactory.create(item);
   }
 
   private void update( final ShoppingCartEntity cartEntity ) {
@@ -58,15 +50,19 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
   }
 
   @Override public void removeItemFromShoppingCart( final UUID cartId, final UUID itemId ) {
-    final ShoppingCartEntity cart = ShoppingCartFactory.create( repository.findById( cartId ) );
+    final ShoppingCartEntity cart = getShoppingCartById( cartId );
     cart.removeItem( itemId );
-    update(cart);
+    update( cart );
   }
 
   @Override public UUID checkOut( final UUID cartId ) {
-    final ShoppingCartEntity cart = ShoppingCartFactory.create( repository.findById( cartId ) );
+    final ShoppingCartEntity cart = getShoppingCartById( cartId );
     ordersCheckoutPolicyService.invoke( cart.getItems() );
     return shoppingCartsCheckoutPolicyService.invoke( cartId );
+  }
+
+  private ShoppingCartEntity getShoppingCartById( final UUID cartId ) {
+    return ShoppingCartFactory.create( repository.findById( cartId ) );
   }
 
   @Override public List<ShoppingCartListRow> getShoppingCarts() {

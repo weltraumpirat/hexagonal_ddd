@@ -8,5 +8,4 @@ import java.util.UUID;
 public interface ShoppingCartQueriesApi {
   List<ShoppingCartListRow> getShoppingCarts();
   List<ShoppingCartItem> getShoppingCartItems(final UUID cartId );
-  ShoppingCart getShoppingCartById( UUID cartId );
 }

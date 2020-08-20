@@ -56,7 +56,7 @@ public class ShoppingCartsApiTest {
 
       @Test
       void shouldReturnListWithShoppingCart() {
-        assertThat( api.getShoppingCartById( cartId ).getId() ).isEqualTo( cartId );
+        assertThat( api.getShoppingCarts().get(0).getId() ).isEqualTo( cartId );
       }
     }
 
@@ -167,7 +167,7 @@ public class ShoppingCartsApiTest {
         @Test
         @DisplayName( "the cart should no longer exist" )
         void cartShouldNoLongerExist() {
-          assertThatThrownBy( () -> api.getShoppingCartById( cartId ) );
+         assertThat(api.getShoppingCarts( ).stream().filter(cart -> cart.getId().equals( cartId) ).count()).isEqualTo(0);
         }
 
         @Test
