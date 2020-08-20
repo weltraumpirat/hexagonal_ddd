@@ -39,10 +39,12 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     shoppingCartListReadModel.handleCartDeleted( cartId );
   }
 
-  @Override public void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem shoppingCartItem ) {
-    productValidationService.validate( shoppingCartItem );
+  @Override public void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem item ) {
+    final UUID uuid = item.getId() != null ? item.getId() : UUID.randomUUID();
+    final ShoppingCartItem itemToAdd = new ShoppingCartItem( uuid, item.getLabel(), item.getPrice() );
+    productValidationService.validate( itemToAdd );
     final ShoppingCartEntity cartEntity = ShoppingCartFactory.create( repository.findById( cartId ) );
-    cartEntity.addItem( shoppingCartItem );
+    cartEntity.addItem( itemToAdd );
     update( cartEntity );
   }
 

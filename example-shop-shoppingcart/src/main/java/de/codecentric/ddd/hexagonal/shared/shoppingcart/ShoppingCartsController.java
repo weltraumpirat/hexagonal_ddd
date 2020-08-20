@@ -55,8 +55,7 @@ public class ShoppingCartsController {
   @PostMapping( "/api/cart/{cartId}" )
   public void addItem( @PathVariable final UUID cartId, @RequestBody final ShoppingCartItem item ) {
     try {
-      final ShoppingCartItem itemToAdd = new ShoppingCartItem( item.getId() != null ? item.getId() : UUID.randomUUID(),item.getLabel(), item.getPrice() );
-      api.addItemToShoppingCart( cartId, itemToAdd );
+      api.addItemToShoppingCart( cartId, item );
     } catch( NoSuchElementException e ) {
       throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "The provided item is not a valid product." );
     } catch( ShoppingCartNotFoundException e ) {
