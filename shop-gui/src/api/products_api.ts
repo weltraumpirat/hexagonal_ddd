@@ -17,7 +17,7 @@ export class ProductsApi {
   }
 
   public async createCatalogWithProducts(products: ProductData[]): Promise<void> {
-    await Promise.all(products.map(async p => await axios.post(ENDPOINT_PRODUCTS, p)))
+    await Promise.all(products.map(this.addProduct))
   }
 
   public async getProducts(): Promise<ProductData[]> {
