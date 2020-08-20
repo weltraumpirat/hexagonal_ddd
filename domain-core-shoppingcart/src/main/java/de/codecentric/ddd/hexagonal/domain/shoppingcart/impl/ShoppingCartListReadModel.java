@@ -2,35 +2,35 @@ package de.codecentric.ddd.hexagonal.domain.shoppingcart.impl;
 
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCart;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartListRowRepository;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class ShoppingCartListReadModel {
-  private final HashMap<UUID, ShoppingCartListRow> shoppingCarts;
+  private final ShoppingCartListRowRepository repository;
 
-  public ShoppingCartListReadModel() {
-    shoppingCarts = new HashMap<>();
+  public ShoppingCartListReadModel( final ShoppingCartListRowRepository repository ) {
+    this.repository = repository;
   }
 
+
   public List<ShoppingCartListRow> read() {
-    return shoppingCarts.values().stream().collect( Collectors.toUnmodifiableList() );
+    return repository.findAll();
   }
 
   public void handleCartCreated( final ShoppingCart cart ) {
-    shoppingCarts.put( cart.getId(), rowFromCart( cart ) );
+    repository.create( rowFromCart( cart ) );
   }
 
   public void handleCartDeleted( final UUID id ) {
-    shoppingCarts.remove( id );
+    repository.delete( id );
   }
 
   public void handleCartUpdated( final ShoppingCart cart ) {
-    shoppingCarts.put( cart.getId(), rowFromCart( cart ) );
+    repository.update( rowFromCart( cart ) );
   }
 
   private ShoppingCartListRow rowFromCart( final ShoppingCart cart ) {

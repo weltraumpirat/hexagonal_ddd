@@ -7,6 +7,8 @@ import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsApi;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartItemsReadModel;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartListReadModel;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartsApiImpl;
+import de.codecentric.ddd.hexagonal.shoppingcart.persistence.ShoppingCartItemsInfoRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.shoppingcart.persistence.ShoppingCartListRowRepositoryInMemory;
 import de.codecentric.ddd.hexagonal.shoppingcart.persistence.ShoppingCartRepositoryInMemory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,8 +44,9 @@ public class ShoppingCartsApiTest {
       this.api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService,
                                            validationService,
                                            new ShoppingCartRepositoryInMemory(),
-                                           new ShoppingCartListReadModel(),
-                                           new ShoppingCartItemsReadModel() );
+                                           new ShoppingCartListReadModel( new ShoppingCartListRowRepositoryInMemory() ),
+                                           new ShoppingCartItemsReadModel(
+                                             new ShoppingCartItemsInfoRepositoryInMemory() ) );
     }
 
     @Nested
@@ -80,8 +83,8 @@ public class ShoppingCartsApiTest {
       api = new ShoppingCartsApiImpl( ordersCheckoutPolicyService,
                                       validationService,
                                       new ShoppingCartRepositoryInMemory(),
-                                      new ShoppingCartListReadModel(),
-                                      new ShoppingCartItemsReadModel() );
+                                      new ShoppingCartListReadModel( new ShoppingCartListRowRepositoryInMemory() ),
+                                      new ShoppingCartItemsReadModel( new ShoppingCartItemsInfoRepositoryInMemory() ) );
       cartId = api.createEmptyShoppingCart();
     }
 
@@ -153,7 +156,7 @@ public class ShoppingCartsApiTest {
 
         @Test
         void shouldBeEmpty() {
-          assertThat( api.getShoppingCartItems( cartId ) .getCount()).isEqualTo( 0 );
+          assertThat( api.getShoppingCartItems( cartId ).getCount() ).isEqualTo( 0 );
         }
       }
 
