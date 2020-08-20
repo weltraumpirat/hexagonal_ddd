@@ -102,7 +102,7 @@ public class ShoppingCartsApiTest {
 
       @Test
       void shouldContainTheItem() {
-        assertThat( api.getShoppingCartItems( cartId ) ).isEqualTo( Collections.singletonList( item ) );
+        assertThat( api.getShoppingCartItems( cartId ).getItems() ).isEqualTo( Collections.singletonList( item ) );
       }
     }
 
@@ -153,7 +153,7 @@ public class ShoppingCartsApiTest {
 
         @Test
         void shouldBeEmpty() {
-          assertThat( api.getShoppingCartItems( cartId ) ).isEqualTo( Collections.emptyList() );
+          assertThat( api.getShoppingCartItems( cartId ) .getCount()).isEqualTo( 0 );
         }
       }
 

@@ -34,12 +34,20 @@ public class ShoppingCartListReadModel {
   }
 
   private ShoppingCartListRow rowFromCart( final ShoppingCart cart ) {
-    final Money total = cart.getItems().stream()
-                          .map( ShoppingCartItem::getPrice )
-                          .reduce( ( final Money price, final Money sum ) -> sum.plus( price ) )
-                          .orElse( Money.zero( CurrencyUnit.EUR ) );
     return new ShoppingCartListRow( cart.getId(),
                                     cart.getItems().size(),
-                                    total.getCurrencyUnit()+" "+total.getAmount() );
+                                    priceAsString( totalPrice( cart.getItems() ) ) );
+  }
+
+  private Money totalPrice( List<ShoppingCartItem> items ) {
+    return items.stream()
+             .map( ShoppingCartItem::getPrice )
+             .reduce( ( final Money price, final Money sum ) -> sum.plus( price ) )
+             .orElse( Money.zero( CurrencyUnit.EUR ) );
+  }
+
+  private String priceAsString( final Money money ) {
+    return money.getCurrencyUnit()+" "+
+           money.getAmount();
   }
 }

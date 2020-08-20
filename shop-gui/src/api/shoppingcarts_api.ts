@@ -21,16 +21,6 @@ export interface ShoppingCartItemsInfo {
 
 const ENDPOINT_CARTS = 'http://localhost/api/cart'
 
-function totalPrice(items: ShoppingCartItemData[]): string {
-  if (items.length !== 0) {
-    return items
-      .map(({price}) => Money.fromString(price))
-      .reduce((total, price) => total.plus(price), Money.fromString(ZERO))
-      .toString()
-  }
-  return ZERO
-}
-
 export class ShoppingCartsApi {
 
   public async createEmptyShoppingCart(): Promise<UUID> {
@@ -51,10 +41,7 @@ export class ShoppingCartsApi {
 
 
   public async getShoppingCartItems(id: UUID): Promise<ShoppingCartItemsInfo> {
-    const items: ShoppingCartItemData[] = (await axios.get(`${ENDPOINT_CARTS}/${id}`)).data
-    const count = items.length
-    const total = totalPrice(items)
-    return {items, count, total}
+    return (await axios.get(`${ENDPOINT_CARTS}/${id}`)).data
   }
 }
 

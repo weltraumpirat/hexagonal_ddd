@@ -2,26 +2,41 @@ package de.codecentric.ddd.hexagonal.domain.shoppingcart.impl;
 
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCart;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class ShoppingCartItemsReadModel {
-  private HashMap<UUID, List<ShoppingCartItem>> items;
+  private final HashMap<UUID, ShoppingCartItemsInfo> items;
 
   public ShoppingCartItemsReadModel() {
     this.items = new HashMap<>();
   }
 
-  public List<ShoppingCartItem> read( final UUID cartId ) {
-    return items.get( cartId ).stream().collect( Collectors.toUnmodifiableList() );
+  public ShoppingCartItemsInfo read( final UUID cartId ) {
+    return this.items.get( cartId );
   }
 
   public void handleCartUpdated( final ShoppingCart cart ) {
-    items.put( cart.getId(), cart.getItems() );
+    items.put( cart.getId(), new ShoppingCartItemsInfo( cart.getItems(),
+                                                        cart.getItems().size(),
+                                                        priceAsString( totalPrice( cart.getItems() ) ) ) );
+  }
+
+  private Money totalPrice( List<ShoppingCartItem> items ) {
+    return items.stream()
+             .map( ShoppingCartItem::getPrice )
+             .reduce( ( final Money price, final Money sum ) -> sum.plus( price ) )
+             .orElse( Money.zero( CurrencyUnit.EUR ) );
+  }
+
+  private String priceAsString( final Money money ) {
+    return money.getCurrencyUnit()+" "+
+           money.getAmount();
   }
 
   public void handleCartDeleted( final UUID cartId ) {
@@ -29,7 +44,8 @@ public class ShoppingCartItemsReadModel {
   }
 
   public void handleCartCreated( final ShoppingCart cart ) {
-    items.put( cart.getId(), Collections.emptyList() );
-
+    items
+      .put( cart.getId(),
+            new ShoppingCartItemsInfo( Collections.emptyList(), 0, priceAsString( totalPrice( cart.getItems() ) ) ) );
   }
 }

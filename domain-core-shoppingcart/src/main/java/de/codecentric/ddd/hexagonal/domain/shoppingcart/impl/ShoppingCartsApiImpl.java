@@ -75,7 +75,7 @@ public class ShoppingCartsApiImpl implements ShoppingCartsApi {
     return shoppingCartListReadModel.read();
   }
 
-  @Override public List<ShoppingCartItem> getShoppingCartItems( final UUID cartId ) {
+  @Override public ShoppingCartItemsInfo getShoppingCartItems( final UUID cartId ) {
     return shoppingCartItemsReadModel.read( cartId );
   }
 }

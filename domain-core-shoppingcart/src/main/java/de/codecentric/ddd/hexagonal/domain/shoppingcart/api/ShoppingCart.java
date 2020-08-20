@@ -10,6 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class ShoppingCart {
-  private final UUID id;
+  private final UUID                   id;
   private final List<ShoppingCartItem> items;
 }
