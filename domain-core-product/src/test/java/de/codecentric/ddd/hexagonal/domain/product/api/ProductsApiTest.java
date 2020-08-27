@@ -1,8 +1,11 @@
 package de.codecentric.ddd.hexagonal.domain.product.api;
 
+import de.codecentric.ddd.hexagonal.domain.product.impl.ProductValidationReadModel;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductsApiImpl;
 import de.codecentric.ddd.hexagonal.product.persistence.ProductRepositoryInMemory;
-import org.assertj.core.api.Assertions;
+import de.codecentric.ddd.hexagonal.product.persistence.ProductValidationRepositoryInMemory;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.*;
@@ -20,7 +23,7 @@ class ProductsApiTest {
   class GivenAnEmptyProductList {
     @BeforeEach
     void setUp() {
-      api = new ProductsApiImpl( new ProductRepositoryInMemory() );
+      api = new ProductsApiImpl( new ProductRepositoryInMemory(), new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ) );
     }
 
     @Nested
@@ -41,10 +44,11 @@ class ProductsApiTest {
       }
 
       @Test
-      @DisplayName( "should contain a product" )
+      @DisplayName( "should contain the product" )
       void shouldAddAProduct() {
-        Assertions.assertThat( api.getProducts() )
+        assertThat( api.getProducts() )
           .isEqualTo( Collections.singletonList( product ) );
+        assertThat(api.getProductById( product.getId() )).isEqualTo(product);
       }
     }
   }
@@ -55,7 +59,7 @@ class ProductsApiTest {
 
     @BeforeEach
     void setUp() {
-      api = new ProductsApiImpl( new ProductRepositoryInMemory() );
+      api = new ProductsApiImpl( new ProductRepositoryInMemory(), new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ) );
       final Product product = new Product( UUID,
                                            "Whole Milk",
                                            PackagingType.CARTON,
@@ -76,8 +80,14 @@ class ProductsApiTest {
       @Test
       @DisplayName( "should return an empty product list" )
       void shouldReturnEmptyList() {
-        Assertions.assertThat( api.getProducts() )
+        assertThat( api.getProducts() )
           .isEqualTo( Collections.emptyList() );
+      }
+
+      @Test
+      @DisplayName( "should throw when the product is queried" )
+      void shouldThrowWhenProductIsQueried() {
+        assertThatThrownBy(()-> api.getProductById(UUID) );
       }
     }
   }

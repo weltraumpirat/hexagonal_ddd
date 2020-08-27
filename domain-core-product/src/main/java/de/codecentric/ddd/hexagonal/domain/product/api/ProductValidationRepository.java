@@ -1,14 +1,11 @@
 package de.codecentric.ddd.hexagonal.domain.product.api;
 
-import java.util.List;
 import java.util.UUID;
 
-public interface ProductRepository {
+public interface ProductValidationRepository {
+  Product findByLabel( String label );
+
   void create( Product product );
 
   void delete( UUID id );
-
-  List<Product> findAll();
-
-  Product findById( UUID id );
 }

@@ -36,13 +36,21 @@ public class ProductRepositoryJpa implements ProductRepository {
   @Override public List<Product> findAll() {
     final Iterable<ProductEntity> entities = jpaRepo.findAll();
     return StreamSupport.stream( entities.spliterator(), false )
-                                     .map(e -> new Product(
-                                       e.getId(),
-                                       e.getName(),
-                                       e.getPackagingType(),
-                                       toMoney(e.getPrice()),
-                                       toAmount(e.getAmount())
-                                     ))
+                                     .map( this::entityToProduct )
                                      .collect( Collectors.toList() );
+  }
+
+  private Product entityToProduct(ProductEntity e) {
+    return new Product(
+      e.getId(),
+      e.getName(),
+      e.getPackagingType(),
+      toMoney( e.getPrice() ),
+      toAmount( e.getAmount() )
+    );
+  }
+
+  @Override public Product findById( final UUID id ) {
+    return jpaRepo.findById( id ).map(this::entityToProduct).orElseThrow();
   }
 }

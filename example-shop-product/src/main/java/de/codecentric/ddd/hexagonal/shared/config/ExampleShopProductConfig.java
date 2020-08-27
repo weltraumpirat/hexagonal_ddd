@@ -5,12 +5,15 @@ import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductsApi;
+import de.codecentric.ddd.hexagonal.domain.product.impl.ProductValidationReadModel;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductsApiImpl;
+import de.codecentric.ddd.hexagonal.product.persistence.ProductValidationRepositoryInMemory;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.MoneyModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.PackagingTypeModule;
 import de.codecentric.ddd.hexagonal.shared.product.persistence.ProductCrudRepository;
 import de.codecentric.ddd.hexagonal.shared.product.persistence.ProductRepositoryJpa;
+import de.codecentric.ddd.hexagonal.shared.product.persistence.ProductValidationRepositoryJpa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +23,7 @@ import org.springframework.context.annotation.Primary;
 public class ExampleShopProductConfig {
   @Bean
   ProductsApi createProductApi( @Autowired final ProductCrudRepository jpaRepository ) {
-    return new ProductsApiImpl( new ProductRepositoryJpa( jpaRepository ) );
+    return new ProductsApiImpl( new ProductRepositoryJpa( jpaRepository ), new ProductValidationReadModel( new ProductValidationRepositoryJpa() ) );
   }
 
   @Bean

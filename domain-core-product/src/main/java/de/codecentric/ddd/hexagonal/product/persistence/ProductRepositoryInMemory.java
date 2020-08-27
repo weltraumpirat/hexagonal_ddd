@@ -30,4 +30,8 @@ public class ProductRepositoryInMemory implements ProductRepository {
     return products.values().stream()
              .collect( Collectors.toUnmodifiableList() );
   }
+
+  @Override public Product findById( final UUID id ) {
+    return products.get(id);
+  }
 }

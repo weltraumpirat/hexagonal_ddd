@@ -2,10 +2,11 @@ package de.codecentric.ddd.hexagonal.shared.shoppingcart.impl;
 
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ProductValidationService;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class ProductValidationServiceRest implements ProductValidationService {
   private final RestTemplate template;
@@ -15,11 +16,13 @@ public class ProductValidationServiceRest implements ProductValidationService {
   }
 
   @Override public void validate( final ShoppingCartItem shoppingCartItem ) {
-    final Product[] result = Optional.ofNullable( template.getForObject( "http://example-shop-product:8080/api/product", Product[].class )
-                                                ).orElse( new Product[]{} );
-    Arrays.stream( result )
-      .filter( p -> shoppingCartItem.getLabel().equals( p.toLabel() ) )
-      .findAny()
-      .orElseThrow();
+    final Map<String, String> variables = Map.of( "label", shoppingCartItem.getLabel() );
+    final ResponseEntity<Void> response = template.getForEntity(
+      "http://example-shop-product:8080/api/product",
+      Void.class,
+      variables );
+    if( !response.getStatusCode().is2xxSuccessful() ) {
+      throw new NoSuchElementException();
+    }
   }
 }
