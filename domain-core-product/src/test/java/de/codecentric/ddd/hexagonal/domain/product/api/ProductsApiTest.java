@@ -1,10 +1,12 @@
 package de.codecentric.ddd.hexagonal.domain.product.api;
 
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductListReadModel;
+import de.codecentric.ddd.hexagonal.domain.product.impl.ProductShoppingListReadModel;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductValidationReadModel;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductsApiImpl;
 import de.codecentric.ddd.hexagonal.product.persistence.ProductListRepositoryInMemory;
 import de.codecentric.ddd.hexagonal.product.persistence.ProductRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.product.persistence.ProductShoppingListRepositoryInMemory;
 import de.codecentric.ddd.hexagonal.product.persistence.ProductValidationRepositoryInMemory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,8 +27,10 @@ class ProductsApiTest {
   class GivenAnEmptyProductList {
     @BeforeEach
     void setUp() {
-      api = new ProductsApiImpl( new ProductRepositoryInMemory(), new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ),
-                                 new ProductListReadModel( new ProductListRepositoryInMemory() ) );
+      api = new ProductsApiImpl( new ProductRepositoryInMemory(),
+                                 new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ),
+                                 new ProductListReadModel( new ProductListRepositoryInMemory() ),
+                                 new ProductShoppingListReadModel( new ProductShoppingListRepositoryInMemory() ) );
     }
 
     @Nested
@@ -51,7 +55,7 @@ class ProductsApiTest {
       void shouldAddAProduct() {
         assertThat( api.getProducts() )
           .isEqualTo( Collections.singletonList( product ) );
-        assertThat(api.getProductById( product.getId() )).isEqualTo(product);
+        assertThat( api.getProductById( product.getId() ) ).isEqualTo( product );
       }
     }
   }
@@ -62,8 +66,10 @@ class ProductsApiTest {
 
     @BeforeEach
     void setUp() {
-      api = new ProductsApiImpl( new ProductRepositoryInMemory(), new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ),
-                                 new ProductListReadModel( new ProductListRepositoryInMemory() ) );
+      api = new ProductsApiImpl( new ProductRepositoryInMemory(),
+                                 new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ),
+                                 new ProductListReadModel( new ProductListRepositoryInMemory() ),
+                                 new ProductShoppingListReadModel( new ProductShoppingListRepositoryInMemory() ) );
       final Product product = new Product( UUID,
                                            "Whole Milk",
                                            PackagingType.CARTON,
@@ -91,7 +97,7 @@ class ProductsApiTest {
       @Test
       @DisplayName( "should throw when the product is queried" )
       void shouldThrowWhenProductIsQueried() {
-        assertThatThrownBy(()-> api.getProductById(UUID) );
+        assertThatThrownBy( () -> api.getProductById( UUID ) );
       }
     }
   }

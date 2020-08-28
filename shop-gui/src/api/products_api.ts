@@ -9,6 +9,7 @@ export interface ProductData {
   price: string
 }
 const ENDPOINT_PRODUCTS = "http://localhost/api/product"
+const ENDPOINT_SHOPPING = "http://localhost/api/product/shopping"
 export class ProductsApi {
 
 
@@ -21,6 +22,6 @@ export class ProductsApi {
   }
 
   public async getProducts(): Promise<ProductData[]> {
-    return (await axios.get(ENDPOINT_PRODUCTS)).data
+    return (await axios.get(ENDPOINT_SHOPPING)).data
   }
 }

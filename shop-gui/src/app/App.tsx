@@ -74,9 +74,13 @@ function App(): ReactElement {
     fetch()
   }, [])
 
-  const handleNavigationSelect = useCallback((ev: CustomEvent): void => {
-    setActive(ev.detail.selected)
-    history.push(`/${ev.detail.selected}`)
+  const handleNavigationSelect = useCallback(async ({detail: {selected}}: CustomEvent): Promise<void> => {
+    setActive(selected)
+    if(selected === 'orders')
+      setOrders(await ordersApi.getOrders())
+    if(selected === 'shopping')
+      setProducts(await productsApi.getProducts())
+    history.push(`/${selected}`)
   }, [])
 
   const updateAfterShoppingCartChange = useCallback(async (): Promise<void> => {

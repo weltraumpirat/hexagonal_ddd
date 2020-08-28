@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductsApi;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductListReadModel;
+import de.codecentric.ddd.hexagonal.domain.product.impl.ProductShoppingListReadModel;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductValidationReadModel;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductsApiImpl;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
@@ -22,10 +23,12 @@ public class ExampleShopProductConfig {
   @Bean
   ProductsApi createProductApi( @Autowired final ProductCrudRepository crudRepository,
                                 @Autowired final ProductValidationCrudRepository validationCrudRepository,
-                                @Autowired final ProductListCrudRepository listCrudRepository ) {
+                                @Autowired final ProductListCrudRepository listCrudRepository,
+                                @Autowired final ProductShoppingListCrudRepository shoppingListCrudRepository ) {
     return new ProductsApiImpl( new ProductRepositoryJpa( crudRepository ),
                                 new ProductValidationReadModel( new ProductValidationRepositoryJpa( validationCrudRepository ) ),
-                                new ProductListReadModel( new ProductListRepositoryJpa(listCrudRepository) ) );
+                                new ProductListReadModel( new ProductListRepositoryJpa(listCrudRepository) ),
+                                new ProductShoppingListReadModel( new ProductShoppingListRepositoryJpa( shoppingListCrudRepository )) );
   }
 
   @Bean
