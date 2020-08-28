@@ -5,8 +5,9 @@ import java.util.UUID;
 
 public interface ProductsQueriesApi {
   List<Product> getProducts();
+  List<ProductListRow> getProductList();
 
   Product getProductById( UUID id );
 
-  Product validateProduct( String label );
+  ProductValidationEntry validateProduct( String label );
 }

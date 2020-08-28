@@ -6,14 +6,17 @@ import {
   WiredButton,
   WiredCard
 } from 'react-wired-elements'
-import {ProductData} from '../../api/products_api'
+import {
+  ProductData,
+  ProductListRowData
+} from '../../api/products_api'
 import './Products.css'
 import {AddProductDialog} from './AddProductDialog'
 import {ProductList} from './ProductList'
 
 
 type ProductsProps = {
-  products?: ProductData[]
+  products?: ProductListRowData[]
   onProductAdded?: (p: ProductData) => void
 }
 

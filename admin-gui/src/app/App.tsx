@@ -13,6 +13,7 @@ import {
 import {createBrowserHistory} from 'history'
 import {
   ProductData,
+  ProductListRowData,
   ProductsApi
 } from '../api/products_api'
 import {Navigation} from './navigation/Navigation'
@@ -52,7 +53,7 @@ const ordersApi = new OrdersApi()
 const shoppingCartsApi = new ShoppingCartsApi()
 
 function App(): ReactElement {
-  const init: ProductData[] = []
+  const init: ProductListRowData[] = []
   const initOrders: OrderData[] = []
   const initCarts: ShoppingCartData[] = []
   const [products, setProducts] = useState(init)

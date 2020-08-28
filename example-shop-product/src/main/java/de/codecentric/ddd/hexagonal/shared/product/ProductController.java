@@ -1,6 +1,7 @@
 package de.codecentric.ddd.hexagonal.shared.product;
 
 import de.codecentric.ddd.hexagonal.domain.product.api.Product;
+import de.codecentric.ddd.hexagonal.domain.product.api.ProductListRow;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductNotFoundException;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductsApi;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -9,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = {"http://localhost:3000","http://localhost:3001","http://localhost" })
 @RestController
@@ -21,9 +21,8 @@ public class ProductController {
   }
 
   @GetMapping( "/api/product" )
-  public List<Product> getProducts() {
-    return productApi.getProducts().stream()
-             .collect( Collectors.toUnmodifiableList() );
+  public List<ProductListRow> getProducts() {
+    return productApi.getProductList();
   }
 
   @GetMapping( value = "/api/product", params = "label")

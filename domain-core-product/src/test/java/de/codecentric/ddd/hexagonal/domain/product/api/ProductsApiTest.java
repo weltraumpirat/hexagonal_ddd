@@ -1,7 +1,9 @@
 package de.codecentric.ddd.hexagonal.domain.product.api;
 
+import de.codecentric.ddd.hexagonal.domain.product.impl.ProductListReadModel;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductValidationReadModel;
 import de.codecentric.ddd.hexagonal.domain.product.impl.ProductsApiImpl;
+import de.codecentric.ddd.hexagonal.product.persistence.ProductListRepositoryInMemory;
 import de.codecentric.ddd.hexagonal.product.persistence.ProductRepositoryInMemory;
 import de.codecentric.ddd.hexagonal.product.persistence.ProductValidationRepositoryInMemory;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +25,8 @@ class ProductsApiTest {
   class GivenAnEmptyProductList {
     @BeforeEach
     void setUp() {
-      api = new ProductsApiImpl( new ProductRepositoryInMemory(), new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ) );
+      api = new ProductsApiImpl( new ProductRepositoryInMemory(), new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ),
+                                 new ProductListReadModel( new ProductListRepositoryInMemory() ) );
     }
 
     @Nested
@@ -59,7 +62,8 @@ class ProductsApiTest {
 
     @BeforeEach
     void setUp() {
-      api = new ProductsApiImpl( new ProductRepositoryInMemory(), new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ) );
+      api = new ProductsApiImpl( new ProductRepositoryInMemory(), new ProductValidationReadModel( new ProductValidationRepositoryInMemory() ),
+                                 new ProductListReadModel( new ProductListRepositoryInMemory() ) );
       final Product product = new Product( UUID,
                                            "Whole Milk",
                                            PackagingType.CARTON,
