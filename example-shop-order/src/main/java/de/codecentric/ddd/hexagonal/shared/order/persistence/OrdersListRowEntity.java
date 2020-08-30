@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderEntity {
+public class OrdersListRowEntity {
   @Id
   @Column(length=16, nullable = false, unique = true)
   private UUID      id;
@@ -22,7 +22,7 @@ public class OrderEntity {
   @Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private LocalDateTime timestamp;
 
-  public OrderEntity(final UUID id, final String total) {
+  public OrdersListRowEntity( final UUID id, final String total ) {
     this.id = id;
     this.total = total;
   }

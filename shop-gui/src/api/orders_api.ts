@@ -28,6 +28,6 @@ export class OrdersApi {
 
   public async getOrders(): Promise<OrderData[]> {
     const data: OrderData[] = (await axios.get(ENDPOINT_ORDER)).data
-    return data.map(d => ({...d, timestamp: moment(d.timestamp)})).sort((a, b) => a.timestamp.isBefore(b.timestamp) ? 1 : -1)
+    return data.map(d => ({...d, timestamp: moment(d.timestamp)}))
   }
 }

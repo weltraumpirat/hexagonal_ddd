@@ -1,12 +1,16 @@
 package de.codecentric.ddd.hexagonal.domain.order.api;
 
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersApiImpl;
+import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersListReadModel;
+import static de.codecentric.ddd.hexagonal.domain.product.api.OrdersListRepository.DATE_TIME_FORMATTER;
 import de.codecentric.ddd.hexagonal.order.persistence.OrderRepositoryInMemory;
+import de.codecentric.ddd.hexagonal.order.persistence.OrdersListRepositoryInMemory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.money.CurrencyUnit.EUR;
 import org.joda.money.Money;
 import org.junit.jupiter.api.*;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -21,24 +25,27 @@ public class OrdersApiTest {
 
     @BeforeEach
     void setUp() {
-      api = new OrdersApiImpl( new OrderRepositoryInMemory() );
+      api = new OrdersApiImpl( new OrderRepositoryInMemory(),
+                               new OrdersListReadModel( new OrdersListRepositoryInMemory() ) );
     }
 
     @Nested
     @DisplayName( "when an order is created" )
     class WhenAnOrderIsCreated {
-      private Order order;
+      private OrdersListRow listRow;
 
       @BeforeEach
       void setUp() {
-        order = new Order( UUID, Money.zero( EUR ), Collections.emptyList(), null );
+        final String time = LocalDateTime.now().format( DATE_TIME_FORMATTER );
+        listRow = new OrdersListRow( UUID, Money.zero( EUR ), Collections.emptyList(), time );
+        final Order order = new Order( UUID, Money.zero( EUR ), Collections.emptyList(), time );
         api.createOrder( order );
       }
 
       @Test
       @DisplayName( "should return a list with the new order" )
       void shouldReturnListWithNewOrder() {
-        assertThat( api.getOrders() ).isEqualTo( Collections.singletonList( order ) );
+        assertThat( api.getOrders() ).isEqualTo( Collections.singletonList( listRow ) );
       }
     }
 

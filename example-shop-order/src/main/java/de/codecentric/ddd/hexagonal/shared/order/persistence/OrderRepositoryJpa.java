@@ -8,14 +8,15 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 import org.joda.money.Money;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
 public class OrderRepositoryJpa implements OrderRepository {
-  public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-  private final OrderPositionCrudRepository jpaPositionsRepo;
-  private final OrderCrudRepository jpaOrderRepo;
+  public static final DateTimeFormatter           DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+  private final       OrderPositionCrudRepository jpaPositionsRepo;
+  private final       OrderCrudRepository         jpaOrderRepo;
 
   public OrderRepositoryJpa(
     final OrderCrudRepository jpaOrderRepo,
@@ -25,7 +26,9 @@ public class OrderRepositoryJpa implements OrderRepository {
   }
 
   @Override public void create( final Order order ) {
-    jpaOrderRepo.save(new OrderEntity( order.getId(), order.getTotal().toString()));
+    jpaOrderRepo.save( new OrderEntity( order.getId(),
+                                        order.getTotal().toString(),
+                                        LocalDateTime.parse( order.getTimestamp(), DATE_TIME_FORMATTER ) ) );
     final List<OrderPositionEntity> entities = order.getPositions().stream().map( p -> {
       OrderPositionEntity entity = new OrderPositionEntity();
       entity.setId( p.getId() );
@@ -54,8 +57,8 @@ public class OrderRepositoryJpa implements OrderRepository {
     } );
 
     return StreamSupport.stream( jpaOrderRepo.findAll().spliterator(), false )
-                                       .map(o -> new Order( o.getId(), toMoney(o.getTotal()), orders.get(o.getId()),
-                                                            DATE_TIME_FORMATTER.format( o.getTimestamp() )) )
-                                       .collect(  toUnmodifiableList());
+             .map( o -> new Order( o.getId(), toMoney( o.getTotal() ), orders.get( o.getId() ),
+                                   DATE_TIME_FORMATTER.format( o.getTimestamp() ) ) )
+             .collect( toUnmodifiableList() );
   }
 }

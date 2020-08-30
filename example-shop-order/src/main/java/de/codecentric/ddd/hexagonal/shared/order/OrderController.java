@@ -2,6 +2,7 @@ package de.codecentric.ddd.hexagonal.shared.order;
 
 import de.codecentric.ddd.hexagonal.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.domain.order.api.OrdersApi;
+import de.codecentric.ddd.hexagonal.domain.order.api.OrdersListRow;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class OrderController {
   }
 
   @GetMapping( "/api/order" )
-  public List<Order> getOrders() {
+  public List<OrdersListRow> getOrders() {
     return api.getOrders();
   }
 
