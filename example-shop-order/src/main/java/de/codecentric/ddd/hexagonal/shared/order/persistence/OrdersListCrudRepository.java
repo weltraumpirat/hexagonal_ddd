@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface OrdersListCrudRepository extends CrudRepository<OrdersListRowEntity, UUID> {
-  @Query("SELECT e FROM OrdersListRowEntity e ORDER BY e.timestamp")
+  @Query("SELECT e FROM OrdersListRowEntity e ORDER BY e.timestamp DESC")
   List<OrdersListRowEntity> findAll();
 }

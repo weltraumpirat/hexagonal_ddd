@@ -4,7 +4,9 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
 import de.codecentric.ddd.hexagonal.domain.order.api.OrdersApi;
+import de.codecentric.ddd.hexagonal.domain.order.impl.CreateOrderHandler;
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersListReadModel;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
@@ -30,8 +32,19 @@ public class ExampleShopOrderConfig {
                              @Autowired final OrderPositionCrudRepository positionsRepository,
                              @Autowired final OrdersListCrudRepository ordersListRowCrudRepository,
                              @Autowired final OrdersListPositionsCrudRepository ordersListPositionsCrudRepository ) {
-    return new OrdersApiImpl( new OrderRepositoryJpa( orderRepository, positionsRepository ), new OrdersListReadModel(
-      new OrdersListRepositoryJpa(ordersListRowCrudRepository, ordersListPositionsCrudRepository) ) );
+    final MessagebusLocal commandbus = new MessagebusLocal();
+    final MessagebusLocal eventbus = new MessagebusLocal();
+    final CreateOrderHandler createOrderHandler =
+      new CreateOrderHandler( new OrderRepositoryJpa( orderRepository, positionsRepository ), eventbus );
+
+    final OrdersListReadModel ordersListReadModel = new OrdersListReadModel(
+      new OrdersListRepositoryJpa( ordersListRowCrudRepository, ordersListPositionsCrudRepository ) );
+
+    return new OrdersApiImpl(
+      ordersListReadModel,
+      eventbus,
+      commandbus,
+      createOrderHandler );
   }
 
   @Bean
