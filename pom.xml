@@ -26,6 +26,7 @@
     <module>example-shop-shoppingcart</module>
     <module>domain-core-order</module>
     <module>domain-core-product</module>
+    <module>domain-core-common</module>
   </modules>
 
   <build>
