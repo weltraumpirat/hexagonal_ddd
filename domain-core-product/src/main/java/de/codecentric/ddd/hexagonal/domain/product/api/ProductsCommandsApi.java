@@ -1,9 +1,10 @@
 package de.codecentric.ddd.hexagonal.domain.product.api;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface ProductsCommandsApi {
-  void addProduct( Product product );
+  CompletableFuture<Void> addProduct( Product product );
 
-  void removeProduct( UUID id );
+  CompletableFuture<Void> removeProduct( UUID id );
 }

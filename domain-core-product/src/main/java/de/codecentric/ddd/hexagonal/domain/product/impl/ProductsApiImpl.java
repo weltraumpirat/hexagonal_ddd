@@ -1,51 +1,51 @@
 package de.codecentric.ddd.hexagonal.domain.product.impl;
 
 
+import de.codecentric.ddd.hexagonal.domain.common.messaging.Transaction;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
 import de.codecentric.ddd.hexagonal.domain.product.api.*;
+import de.codecentric.ddd.hexagonal.domain.product.messaging.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 public class ProductsApiImpl implements ProductsApi {
-  private final ProductRepository            repository;
+  @SuppressWarnings( { "FieldCanBeLocal", "unused" } )
+  private final ProductsFixture              fixture;
   private final ProductValidationReadModel   validationReadModel;
   private final ProductListReadModel         productListReadModel;
   private final ProductShoppingListReadModel productShoppingListReadModel;
+  private final TransactionFactory           transactionFactory;
 
-  public ProductsApiImpl( ProductRepository repository,
+  public ProductsApiImpl( final ProductsFixture fixture,
                           final ProductValidationReadModel validationReadModel,
                           final ProductListReadModel productListReadModel,
-                          final ProductShoppingListReadModel productShoppingListReadModel ) {
-    this.repository = repository;
+                          final ProductShoppingListReadModel productShoppingListReadModel,
+                          final TransactionFactory transactionFactory) {
+    this.fixture = fixture;
     this.validationReadModel = validationReadModel;
     this.productListReadModel = productListReadModel;
     this.productShoppingListReadModel = productShoppingListReadModel;
+    this.transactionFactory = transactionFactory;
   }
 
-  @Override public void addProduct( final Product product ) {
-    repository.create( product );
-    validationReadModel.onProductCreated( product );
-    productListReadModel.onProductCreated( product );
-    productShoppingListReadModel.onProductCreated( product );
+  @Override public CompletableFuture<Void> addProduct( final Product product ) {
+    final UUID correlationId = UUID.randomUUID();
+    final Transaction<Product> transaction = transactionFactory.create(
+      new AddProductCommand( correlationId, product ),
+      ProductCreatedEvent.class,
+      new AddProductFailedEvent( "Timed out while waiting for PRODUCT_CREATED" ) );
+    return transaction.run();
   }
 
-  @Override public void removeProduct( final UUID id ) {
-    repository.delete( id );
-    validationReadModel.onProductRemoved( id );
-    productListReadModel.onProductRemoved( id );
-    productShoppingListReadModel.onProductRemoved( id );
-  }
-
-  @Override public List<Product> getProducts() {
-    return repository.findAll().stream()
-             .collect( Collectors.toUnmodifiableList() );
-  }
-
-  @Override public Product getProductById( final UUID id ) {
-    final Optional<Product> product = Optional.ofNullable( repository.findById( id ) );
-    return product.orElseThrow();
+  @Override public CompletableFuture<Void> removeProduct( final UUID id ) {
+    final UUID correlationId = UUID.randomUUID();
+    final Transaction<UUID> transaction = transactionFactory.create(
+      new RemoveProductCommand( correlationId, id ),
+      ProductRemovedEvent.class,
+      new RemoveProductFailedEvent( "Timed out while waiting for PRODUCT_REMOVED." ) );
+    return transaction.run();
   }
 
   @Override public List<ProductListRow> getProductList() {

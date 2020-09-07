@@ -4,11 +4,10 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductsApi;
-import de.codecentric.ddd.hexagonal.domain.product.impl.ProductListReadModel;
-import de.codecentric.ddd.hexagonal.domain.product.impl.ProductShoppingListReadModel;
-import de.codecentric.ddd.hexagonal.domain.product.impl.ProductValidationReadModel;
-import de.codecentric.ddd.hexagonal.domain.product.impl.ProductsApiImpl;
+import de.codecentric.ddd.hexagonal.domain.product.impl.*;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.MoneyModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.PackagingTypeModule;
@@ -25,10 +24,23 @@ public class ExampleShopProductConfig {
                                 @Autowired final ProductValidationCrudRepository validationCrudRepository,
                                 @Autowired final ProductListCrudRepository listCrudRepository,
                                 @Autowired final ProductShoppingListCrudRepository shoppingListCrudRepository ) {
-    return new ProductsApiImpl( new ProductRepositoryJpa( crudRepository ),
-                                new ProductValidationReadModel( new ProductValidationRepositoryJpa( validationCrudRepository ) ),
-                                new ProductListReadModel( new ProductListRepositoryJpa(listCrudRepository) ),
-                                new ProductShoppingListReadModel( new ProductShoppingListRepositoryJpa( shoppingListCrudRepository )) );
+    final MessagebusLocal commandbus = new MessagebusLocal();
+    final MessagebusLocal eventbus = new MessagebusLocal();
+    final TransactionFactory transactionFactory = new TransactionFactory( eventbus, commandbus );
+    final ProductsFixture fixture =
+      new ProductsFixture( new ProductRepositoryJpa( crudRepository ), eventbus, commandbus );
+    final ProductValidationReadModel validationReadModel =
+      new ProductValidationReadModel( new ProductValidationRepositoryJpa( validationCrudRepository ), eventbus );
+    final ProductListReadModel productListReadModel =
+      new ProductListReadModel( new ProductListRepositoryJpa( listCrudRepository ), eventbus );
+    final ProductShoppingListReadModel shoppingListReadModel =
+      new ProductShoppingListReadModel( new ProductShoppingListRepositoryJpa( shoppingListCrudRepository ), eventbus );
+
+    return new ProductsApiImpl( fixture,
+                                validationReadModel,
+                                productListReadModel,
+                                shoppingListReadModel,
+                                transactionFactory );
   }
 
   @Bean

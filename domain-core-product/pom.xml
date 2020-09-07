@@ -14,6 +14,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.codecentric</groupId>
+      <artifactId>domain-core-common</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.joda</groupId>
       <artifactId>joda-money</artifactId>
       <version>1.0.1</version>

@@ -1,11 +1,11 @@
 package de.codecentric.ddd.hexagonal.domain.common.messaging;
 
+import static java.util.stream.Collectors.toUnmodifiableList;
 import lombok.extern.java.Log;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Log
 public class MessagebusLocal implements Messagebus {
@@ -21,7 +21,7 @@ public class MessagebusLocal implements Messagebus {
     final List<CompletableFuture<Void>> futures = messageHandlers.stream()
                                                     .map( messageHandler -> CompletableFuture.runAsync(
                                                       () -> messageHandler.accept( message ) ) )
-                                                    .collect( Collectors.toUnmodifiableList() );
+                                                    .collect( toUnmodifiableList() );
     try {
       CompletableFuture.allOf( futures.toArray( CompletableFuture[]::new ) ).get();
     } catch( InterruptedException|ExecutionException e ) {
@@ -45,5 +45,9 @@ public class MessagebusLocal implements Messagebus {
 
   @Override public void unregisterAll( Class<?> type ) {
     handlers.remove( type );
+  }
+
+  @Override public void unregisterAll() {
+    handlers.keySet().stream().collect(toUnmodifiableList()).forEach( handlers::remove );
   }
 }

@@ -9,4 +9,5 @@ public interface Messagebus {
   void unregister( final Class<?> type, final MessageHandler<Message<?>> handler );
 
   void unregisterAll( final Class<?> type );
+  void unregisterAll( );
 }
