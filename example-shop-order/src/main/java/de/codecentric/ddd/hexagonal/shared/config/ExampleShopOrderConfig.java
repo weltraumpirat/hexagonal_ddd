@@ -5,10 +5,12 @@ import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
 import de.codecentric.ddd.hexagonal.domain.order.api.OrdersApi;
-import de.codecentric.ddd.hexagonal.domain.order.impl.CreateOrderHandler;
+import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersFixture;
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersListReadModel;
+import de.codecentric.ddd.hexagonal.domain.product.api.OrdersListRepository;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.MoneyModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.PackagingTypeModule;
@@ -34,17 +36,15 @@ public class ExampleShopOrderConfig {
                              @Autowired final OrdersListPositionsCrudRepository ordersListPositionsCrudRepository ) {
     final MessagebusLocal commandbus = new MessagebusLocal();
     final MessagebusLocal eventbus = new MessagebusLocal();
-    final CreateOrderHandler createOrderHandler =
-      new CreateOrderHandler( new OrderRepositoryJpa( orderRepository, positionsRepository ), eventbus );
+    final TransactionFactory transactionFactory = new TransactionFactory( eventbus, commandbus );
+    final OrdersListRepository repository = new OrdersListRepositoryJpa(
+      ordersListRowCrudRepository,
+      ordersListPositionsCrudRepository );
+    final OrdersListReadModel ordersListReadModel = new OrdersListReadModel( repository, eventbus );
+    final OrdersFixture ordersFixture =
+      new OrdersFixture( new OrderRepositoryJpa( orderRepository, positionsRepository ), eventbus, commandbus );
 
-    final OrdersListReadModel ordersListReadModel = new OrdersListReadModel(
-      new OrdersListRepositoryJpa( ordersListRowCrudRepository, ordersListPositionsCrudRepository ) );
-
-    return new OrdersApiImpl(
-      ordersListReadModel,
-      eventbus,
-      commandbus,
-      createOrderHandler );
+    return new OrdersApiImpl( ordersFixture, ordersListReadModel, transactionFactory );
   }
 
   @Bean

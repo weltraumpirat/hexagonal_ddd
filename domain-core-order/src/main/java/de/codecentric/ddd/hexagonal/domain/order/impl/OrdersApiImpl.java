@@ -1,6 +1,7 @@
 package de.codecentric.ddd.hexagonal.domain.order.impl;
 
-import de.codecentric.ddd.hexagonal.domain.common.messaging.Messagebus;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.Transaction;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
 import de.codecentric.ddd.hexagonal.domain.order.api.Order;
 import de.codecentric.ddd.hexagonal.domain.order.api.OrdersApi;
 import de.codecentric.ddd.hexagonal.domain.order.api.OrdersListRow;
@@ -10,24 +11,22 @@ import de.codecentric.ddd.hexagonal.domain.order.messaging.OrderCreatedEvent;
 import lombok.extern.java.Log;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 @Log
 public class OrdersApiImpl implements OrdersApi {
-  private final Messagebus          commandbus;
   private final OrdersListReadModel ordersListReadModel;
-  private final Messagebus          eventbus;
+  @SuppressWarnings( { "FieldCanBeLocal", "unused" } )
+  private final OrdersFixture       ordersFixture;
+  private final TransactionFactory  transactionFactory;
 
-  public OrdersApiImpl( final OrdersListReadModel ordersListReadModel,
-                        final Messagebus eventbus,
-                        final Messagebus commandbus,
-                        final CreateOrderHandler createOrderHandler ) {
+  public OrdersApiImpl(
+    final OrdersFixture ordersFixture,
+    final OrdersListReadModel ordersListReadModel, final TransactionFactory transactionFactory ) {
+    this.ordersFixture = ordersFixture;
+    this.transactionFactory = transactionFactory;
     this.ordersListReadModel = ordersListReadModel;
-    this.eventbus = eventbus;
-    this.commandbus = commandbus;
-    commandbus.register( CreateOrderCommand.class, createOrderHandler::accept );
   }
 
   @Override public List<OrdersListRow> getOrders() {
@@ -35,23 +34,13 @@ public class OrdersApiImpl implements OrdersApi {
   }
 
   @Override public CompletableFuture<Void> createOrder( final Order order ) {
-    final OrderCreatedHandler handler = new OrderCreatedHandler( ordersListReadModel, order );
-    final Runnable register = () -> eventbus.register( OrderCreatedEvent.class, handler::accept );
-    final Runnable unregister = () -> eventbus.unregister( OrderCreatedEvent.class, handler::accept );
-    final Runnable sendCreateOrderCommand = () -> commandbus.send( new CreateOrderCommand( order ) );
-    final Function<Throwable, ? extends Void> timeoutHandler = ( final Throwable e ) -> {
-      eventbus.send( new CreateOrderFailedEvent( e.getMessage() ) );
-      return null;
-    };
-    return
-      CompletableFuture
-        .runAsync( register )
-        .thenRunAsync( sendCreateOrderCommand )
-        .runAfterBothAsync(
-          CompletableFuture.runAsync( handler::waitForTransactionResult )
-            .orTimeout( 3, TimeUnit.SECONDS )
-            .exceptionally( timeoutHandler )
-          , unregister );
+    final UUID correlationId = UUID.randomUUID();
+    final Transaction<Order> transaction = transactionFactory.create(
+      new CreateOrderCommand( correlationId, order ),
+      OrderCreatedEvent.class,
+      new CreateOrderFailedEvent( correlationId, "Timed out waiting for ORDER_CREATED." ) );
+    return transaction.run();
+
   }
 }
 

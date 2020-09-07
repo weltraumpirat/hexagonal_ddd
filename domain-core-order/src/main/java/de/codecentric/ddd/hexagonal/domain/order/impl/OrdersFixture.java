@@ -11,17 +11,20 @@ import static de.codecentric.ddd.hexagonal.domain.product.api.OrdersListReposito
 import java.time.LocalDateTime;
 
 
-public class CreateOrderHandler {
+public class OrdersFixture {
   private final OrderRepository repository;
   private final Messagebus      eventbus;
 
-  public CreateOrderHandler( final OrderRepository repository,
-                             final Messagebus eventbus ) {
+  public OrdersFixture( final OrderRepository repository,
+                        final Messagebus eventbus,
+                        final Messagebus commandbus ) {
     this.repository = repository;
     this.eventbus = eventbus;
+    commandbus.register( CreateOrderCommand.class, this::handleCreateOrder );
   }
-  public void accept( final Message<?> command ) {
-    final Order order = ((CreateOrderCommand) command).getPayload();
+
+  public void handleCreateOrder( final Message<?> command ) {
+    final Order order = ( (CreateOrderCommand) command ).getPayload();
     final Order saved = new Order( order.getId(),
                                    order.getTotal(),
                                    order.getPositions(),
@@ -29,6 +32,9 @@ public class CreateOrderHandler {
                                    ? order.getTimestamp()
                                    : LocalDateTime.now().format( DATE_TIME_FORMATTER ) );
     repository.create( saved );
-    eventbus.send(new OrderCreatedEvent( saved) );
+    command.getCorrelationId()
+      .ifPresentOrElse(
+        correlationId -> eventbus.send( new OrderCreatedEvent( correlationId, saved ) ),
+        () -> eventbus.send( new OrderCreatedEvent( saved ) ) );
   }
 }

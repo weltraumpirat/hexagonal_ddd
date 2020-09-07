@@ -3,7 +3,8 @@ package de.codecentric.ddd.hexagonal.domain.order.api;
 import de.codecentric.ddd.hexagonal.domain.common.messaging.Message;
 import de.codecentric.ddd.hexagonal.domain.common.messaging.Messagebus;
 import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
-import de.codecentric.ddd.hexagonal.domain.order.impl.CreateOrderHandler;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
+import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersFixture;
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersApiImpl;
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersListReadModel;
 import de.codecentric.ddd.hexagonal.domain.order.messaging.CreateOrderCommand;
@@ -33,12 +34,12 @@ public class OrdersApiTest {
 
     @BeforeEach
     void setUp() {
-      final CreateOrderHandler handler = new CreateOrderHandler( new OrderRepositoryInMemory(),
-                                                                 eventbus );
-      api = new OrdersApiImpl( new OrdersListReadModel( new OrdersListRepositoryInMemory() ),
-                               eventbus,
-                               commandbus,
-                               handler );
+      final OrdersFixture ordersFixture = new OrdersFixture( new OrderRepositoryInMemory(), eventbus, commandbus );
+      final OrdersListReadModel ordersListReadModel = new OrdersListReadModel(
+        new OrdersListRepositoryInMemory(), eventbus );
+      final TransactionFactory transactionFactory = new TransactionFactory( eventbus, commandbus );
+
+      api = new OrdersApiImpl( ordersFixture, ordersListReadModel, transactionFactory );
     }
 
     @Nested
@@ -68,11 +69,11 @@ public class OrdersApiTest {
     class WhenOrderCreationFails {
       @BeforeEach
       void setUp() {
-        commandbus.unregisterAll(CreateOrderCommand.class);
+        commandbus.unregisterAll( CreateOrderCommand.class );
 
-        commandbus.register( CreateOrderCommand.class, (final Message<?> command ) -> {
-          throw new RuntimeException("Failed.");
-        });
+        commandbus.register( CreateOrderCommand.class, ( final Message<?> command ) -> {
+          throw new RuntimeException( "Failed." );
+        } );
 
         final String time = LocalDateTime.now().format( DATE_TIME_FORMATTER );
         final Order order = new Order( UUID, Money.zero( EUR ), Collections.emptyList(), time );
@@ -82,7 +83,7 @@ public class OrdersApiTest {
       @Test
       @DisplayName( "should return empty list" )
       void shouldReturnListWithNewOrder() {
-        assertThat( api.getOrders() ).isEqualTo( Collections.emptyList( ) );
+        assertThat( api.getOrders() ).isEqualTo( Collections.emptyList() );
       }
     }
 
