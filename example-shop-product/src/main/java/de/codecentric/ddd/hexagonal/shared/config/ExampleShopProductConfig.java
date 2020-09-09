@@ -4,6 +4,7 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.Messagebus;
 import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
 import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductsApi;
@@ -19,24 +20,60 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class ExampleShopProductConfig {
-  @Bean
-  ProductsApi createProductApi( @Autowired final ProductCrudRepository crudRepository,
-                                @Autowired final ProductValidationCrudRepository validationCrudRepository,
-                                @Autowired final ProductListCrudRepository listCrudRepository,
-                                @Autowired final ProductShoppingListCrudRepository shoppingListCrudRepository ) {
-    final MessagebusLocal commandbus = new MessagebusLocal();
-    final MessagebusLocal eventbus = new MessagebusLocal();
-    final TransactionFactory transactionFactory = new TransactionFactory( eventbus, commandbus );
-    final ProductsFixture fixture =
-      new ProductsFixture( new ProductRepositoryJpa( crudRepository ), eventbus, commandbus );
-    final ProductValidationReadModel validationReadModel =
-      new ProductValidationReadModel( new ProductValidationRepositoryJpa( validationCrudRepository ), eventbus );
-    final ProductListReadModel productListReadModel =
-      new ProductListReadModel( new ProductListRepositoryJpa( listCrudRepository ), eventbus );
-    final ProductShoppingListReadModel shoppingListReadModel =
-      new ProductShoppingListReadModel( new ProductShoppingListRepositoryJpa( shoppingListCrudRepository ), eventbus );
+  @Bean( name = "eventbus" )
+  public Messagebus eventbus() {
+    return new MessagebusLocal();
+  }
 
-    return new ProductsApiImpl( fixture,
+  @Bean( name = "commandbus" )
+  public Messagebus commandbus() {
+    return new MessagebusLocal();
+  }
+
+  @Bean
+  public TransactionFactory transactionFactory(
+    @Autowired final Messagebus eventbus, final Messagebus commandbus ) {
+    return new TransactionFactory( eventbus, commandbus );
+  }
+
+  @Bean
+  public ProductsFixture productsFixture(
+    @Autowired final ProductRepositoryJpa repository,
+    @Autowired final Messagebus eventbus,
+    @Autowired final Messagebus commandbus ) {
+    return new ProductsFixture( repository, eventbus, commandbus );
+  }
+
+  @Bean
+  public ProductValidationReadModel productValidationReadModel(
+    @Autowired final ProductValidationRepositoryJpa validationRepository,
+    @Autowired final Messagebus eventbus
+                                                              ) {
+    return new ProductValidationReadModel( validationRepository, eventbus );
+  }
+
+  @Bean
+  public ProductListReadModel productListReadModel(
+    @Autowired final ProductListRepositoryJpa repository,
+    @Autowired final Messagebus eventbus ) {
+    return new ProductListReadModel( repository, eventbus );
+  }
+
+  @Bean
+  public ProductShoppingListReadModel productShoppingListReadModel(
+    @Autowired final ProductShoppingListRepositoryJpa repository,
+    @Autowired final Messagebus eventbus ) {
+    return new ProductShoppingListReadModel( repository, eventbus );
+  }
+
+  @Bean
+  ProductsApi createProductApi(
+    @Autowired final ProductsFixture productsFixture,
+    @Autowired final TransactionFactory transactionFactory,
+    @Autowired final ProductValidationReadModel validationReadModel,
+    @Autowired final ProductListReadModel productListReadModel,
+    @Autowired final ProductShoppingListReadModel shoppingListReadModel ) {
+    return new ProductsApiImpl( productsFixture,
                                 validationReadModel,
                                 productListReadModel,
                                 shoppingListReadModel,

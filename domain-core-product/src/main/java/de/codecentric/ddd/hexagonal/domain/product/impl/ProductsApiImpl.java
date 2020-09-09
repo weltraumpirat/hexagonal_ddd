@@ -30,18 +30,18 @@ public class ProductsApiImpl implements ProductsApi {
     this.transactionFactory = transactionFactory;
   }
 
-  @Override public CompletableFuture<Void> addProduct( final Product product ) {
+  @Override public CompletableFuture<Product> addProduct( final Product product ) {
     final UUID correlationId = UUID.randomUUID();
-    final Transaction<Product> transaction = transactionFactory.create(
+    final Transaction<Product, Product> transaction = transactionFactory.create(
       new AddProductCommand( correlationId, product ),
       ProductCreatedEvent.class,
       new AddProductFailedEvent( "Timed out while waiting for PRODUCT_CREATED" ) );
     return transaction.run();
   }
 
-  @Override public CompletableFuture<Void> removeProduct( final UUID id ) {
+  @Override public CompletableFuture<UUID> removeProduct( final UUID id ) {
     final UUID correlationId = UUID.randomUUID();
-    final Transaction<UUID> transaction = transactionFactory.create(
+    final Transaction<UUID, UUID> transaction = transactionFactory.create(
       new RemoveProductCommand( correlationId, id ),
       ProductRemovedEvent.class,
       new RemoveProductFailedEvent( "Timed out while waiting for PRODUCT_REMOVED." ) );

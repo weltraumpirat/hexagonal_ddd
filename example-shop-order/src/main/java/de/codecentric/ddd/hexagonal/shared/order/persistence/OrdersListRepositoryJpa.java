@@ -7,10 +7,12 @@ import static de.codecentric.ddd.hexagonal.shared.config.json.MoneyMapper.toMone
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 import org.joda.money.Money;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Service
 public class OrdersListRepositoryJpa implements OrdersListRepository {
   private final OrdersListCrudRepository          crudRepository;
   private final OrdersListPositionsCrudRepository positionsCrudRepository;

@@ -33,9 +33,9 @@ public class OrdersApiImpl implements OrdersApi {
     return ordersListReadModel.read();
   }
 
-  @Override public CompletableFuture<Void> createOrder( final Order order ) {
+  @Override public CompletableFuture<Order> createOrder( final Order order ) {
     final UUID correlationId = UUID.randomUUID();
-    final Transaction<Order> transaction = transactionFactory.create(
+    final Transaction<Order, Order> transaction = transactionFactory.create(
       new CreateOrderCommand( correlationId, order ),
       OrderCreatedEvent.class,
       new CreateOrderFailedEvent( correlationId, "Timed out waiting for ORDER_CREATED." ) );

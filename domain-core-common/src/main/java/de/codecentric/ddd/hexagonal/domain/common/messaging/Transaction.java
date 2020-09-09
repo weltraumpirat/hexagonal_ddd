@@ -2,19 +2,20 @@ package de.codecentric.ddd.hexagonal.domain.common.messaging;
 
 import lombok.extern.java.Log;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Log
-public class Transaction<T> {
-  public final  TransactionResult result;
-  private final UUID              correlationId;
-  private final Messagebus        eventbus;
-  private final Messagebus        commandbus;
-  private final Message<T>        command;
-  private final Class<?>          eventTypeToWaitFor;
-  private final Message<String>   timeoutEvent;
+public class Transaction<T, U> {
+  public final  TransactionResult<U> result;
+  private final UUID                 correlationId;
+  private final Messagebus           eventbus;
+  private final Messagebus           commandbus;
+  private final Message<T>           command;
+  private final Class<?>             eventTypeToWaitFor;
+  private final Message<String>      timeoutEvent;
 
   public Transaction( final Messagebus eventbus,
                       final Messagebus commandbus,
@@ -23,7 +24,7 @@ public class Transaction<T> {
                       final Message<String> transactionFailedEvent ) {
     this.eventTypeToWaitFor = eventTypeToWaitFor;
     this.timeoutEvent = transactionFailedEvent;
-    this.result = new TransactionResult();
+    this.result = new TransactionResult<>();
     this.eventbus = eventbus;
     this.commandbus = commandbus;
     this.correlationId = command.getCorrelationId().orElseThrow();
@@ -43,7 +44,8 @@ public class Transaction<T> {
       .ifPresent( correlationId -> {
         if( correlationId.equals( this.correlationId ) ) {
           synchronized( result ) {
-            result.complete();
+            //noinspection unchecked
+            result.complete( (U) msg.getPayload() );
             result.notify();
           }
         }
@@ -66,12 +68,16 @@ public class Transaction<T> {
     }
   }
 
+  public Optional<U> getResult() {
+    return Optional.ofNullable( result.result );
+  }
+
   private Void timeoutHandler( final Throwable e ) {
     eventbus.send( timeoutEvent );
     return null;
   }
 
-  public CompletableFuture<Void> run() {
+  public CompletableFuture<U> run() {
     return CompletableFuture
              .runAsync( this::register )
              .thenRunAsync( this::send )
@@ -79,14 +85,17 @@ public class Transaction<T> {
                CompletableFuture.runAsync( this::waitForTransactionResult )
                  .orTimeout( 3, TimeUnit.SECONDS )
                  .exceptionally( this::timeoutHandler )
-               , this::unregister );
+               , this::unregister )
+             .thenApply( ignore -> this.getResult().get());
   }
 }
 
-class TransactionResult {
+class TransactionResult<T> {
   public boolean complete = false;
+  public T       result;
 
-  public void complete() {
+  public void complete( final T result ) {
     this.complete = true;
+    this.result = result;
   }
 }

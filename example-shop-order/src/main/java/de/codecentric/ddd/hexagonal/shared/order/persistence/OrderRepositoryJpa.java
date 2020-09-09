@@ -7,12 +7,14 @@ import static de.codecentric.ddd.hexagonal.shared.config.json.MoneyMapper.toMone
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 import org.joda.money.Money;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
+@Service
 public class OrderRepositoryJpa implements OrderRepository {
   public static final DateTimeFormatter           DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
   private final       OrderPositionCrudRepository jpaPositionsRepo;

@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface ProductsCommandsApi {
-  CompletableFuture<Void> addProduct( Product product );
+  CompletableFuture<Product> addProduct( Product product );
 
-  CompletableFuture<Void> removeProduct( UUID id );
+  CompletableFuture<UUID> removeProduct( UUID id );
 }

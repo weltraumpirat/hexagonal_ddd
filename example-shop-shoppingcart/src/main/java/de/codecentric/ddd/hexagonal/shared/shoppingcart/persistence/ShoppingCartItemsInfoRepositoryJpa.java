@@ -6,6 +6,8 @@ import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItemsInfoRepository;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartItemsInfo;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,12 +16,15 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Log
+@Service
 public class ShoppingCartItemsInfoRepositoryJpa implements ShoppingCartItemsInfoRepository {
   private final ShoppingCartItemInfoCrudRepository crudRepository;
   private final ObjectMapper                       mapper;
 
   public ShoppingCartItemsInfoRepositoryJpa(
-    final ShoppingCartItemInfoCrudRepository crudRepository, final ObjectMapper mapper ) {
+    final ShoppingCartItemInfoCrudRepository crudRepository,
+    @Qualifier("customMapper")
+    final ObjectMapper mapper ) {
     this.crudRepository = crudRepository;
     this.mapper = mapper;
   }

@@ -10,7 +10,7 @@ public class TransactionFactory {
     this.commandbus = commandbus;
   }
 
-  public <T> Transaction<T> create( final Message<T> command,
+  public <T,U> Transaction<T,U> create( final Message<T> command,
                                            final Class<?> waitForEvent,
                                            final Message<String> transactionFailedEvent ) {
     return new Transaction<>( eventbus, commandbus, command, waitForEvent, transactionFailedEvent );

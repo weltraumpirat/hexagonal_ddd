@@ -7,6 +7,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.MoneyModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.PackagingTypeModule;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Primary;
 public class ExampleShopJacksonConfig {
   @Bean
   @Primary
+  @Qualifier("customMapper")
   public static ObjectMapper createObjectMapper() {
     ObjectMapper objectmapper = new ObjectMapper();
     objectmapper.setVisibility( FIELD, ANY );

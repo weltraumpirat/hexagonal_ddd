@@ -3,11 +3,13 @@ package de.codecentric.ddd.hexagonal.shared.product.persistence;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductListRepository;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductListRow;
 import static java.util.stream.Collectors.toUnmodifiableList;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
+@Service
 public class ProductListRepositoryJpa implements ProductListRepository {
   private final ProductListCrudRepository crudRepository;
 

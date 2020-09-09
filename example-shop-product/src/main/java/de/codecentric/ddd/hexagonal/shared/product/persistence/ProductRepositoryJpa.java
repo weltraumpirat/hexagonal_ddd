@@ -5,12 +5,15 @@ import de.codecentric.ddd.hexagonal.domain.product.api.ProductRepository;
 import static de.codecentric.ddd.hexagonal.shared.config.json.AmountMapper.toAmount;
 import static de.codecentric.ddd.hexagonal.shared.config.json.MoneyMapper.toMoney;
 import org.joda.money.Money;
+import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Service
 public class ProductRepositoryJpa implements ProductRepository {
   private final ProductCrudRepository jpaRepo;
 
@@ -28,7 +31,7 @@ public class ProductRepositoryJpa implements ProductRepository {
     p.setAmount( product.getAmount().toString() );
     jpaRepo.save( p );
   }
-
+            @Transactional
   @Override public void delete( final UUID id ) {
     jpaRepo.deleteById( id );
   }

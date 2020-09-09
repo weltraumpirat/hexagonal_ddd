@@ -6,11 +6,14 @@ import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartNotFound
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartRepository;
 import static de.codecentric.ddd.hexagonal.shared.config.json.MoneyMapper.toMoney;
 import org.joda.money.Money;
+import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Service
 public class ShoppingCartRepositoryJpa implements ShoppingCartRepository {
   private final ShoppingCartItemCrudRepository jpaItemsRepo;
   private final ShoppingCartCrudRepository     jpaCartsRepo;
@@ -66,18 +69,19 @@ public class ShoppingCartRepositoryJpa implements ShoppingCartRepository {
 
   @Override public List<ShoppingCart> findAll() {
     Map<UUID, List<ShoppingCartItem>> items = new HashMap<>();
-    jpaItemsRepo.findAll().forEach( e->{
+    jpaItemsRepo.findAll().forEach( e -> {
       List<ShoppingCartItem> list = items.getOrDefault( e.getCartId(), new ArrayList<>() );
-      list.add(new ShoppingCartItem( e.getId(),
-                                     e.getLabel(),
-                                     toMoney( e.getPrice() ) ) );
-      items.put(e.getCartId(), list);
+      list.add( new ShoppingCartItem( e.getId(),
+                                      e.getLabel(),
+                                      toMoney( e.getPrice() ) ) );
+      items.put( e.getCartId(), list );
     } );
     return StreamSupport.stream( jpaCartsRepo.findAll().spliterator(), false )
              .map( c -> new ShoppingCart( c.getId(), items.getOrDefault( c.getId(), Collections.emptyList() ) ) )
              .collect( Collectors.toUnmodifiableList() );
   }
 
+  @Transactional
   @Override public void delete( final UUID cartId ) {
     deleteCartItems( cartId );
     deleteCart( cartId );

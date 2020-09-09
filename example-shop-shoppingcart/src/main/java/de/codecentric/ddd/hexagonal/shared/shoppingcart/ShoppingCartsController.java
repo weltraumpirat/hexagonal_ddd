@@ -7,12 +7,13 @@ import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartItemsIn
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartListRow;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @CrossOrigin(origins = {"http://localhost:3000","http://localhost:3001","http://localhost" })
 @RestController
@@ -40,46 +41,56 @@ public class ShoppingCartsController {
 
   @PostMapping( "/api/cart" )
   public UUID createEmptyCart() {
-    return api.createEmptyShoppingCart();
+    try {
+      return api.createEmptyShoppingCart().get();
+    } catch( InterruptedException | ExecutionException e ) {
+      throw new ResponseStatusException( HttpStatus.INTERNAL_SERVER_ERROR );
+    }
   }
 
   @DeleteMapping( "/api/cart/{cartId}" )
-  @Transactional
   public void deleteCart( @PathVariable final UUID cartId ) {
     try {
-      api.deleteCartById( cartId );
+      api.deleteCartById( cartId ).get();
     } catch( ShoppingCartNotFoundException e ) {
       throw shoppingCartNotFoundResponse( cartId, e );
+    } catch( InterruptedException | ExecutionException e ) {
+      throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   @PostMapping( "/api/cart/{cartId}" )
   public void addItem( @PathVariable final UUID cartId, @RequestBody final ShoppingCartItem item ) {
     try {
-      api.addItemToShoppingCart( cartId, item );
+      api.addItemToShoppingCart( cartId, item ).get();
     } catch( NoSuchElementException e ) {
       throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "The provided item is not a valid product." );
     } catch( ShoppingCartNotFoundException e ) {
       throw shoppingCartNotFoundResponse( cartId, e );
+    } catch( InterruptedException | ExecutionException e ) {
+      throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   @DeleteMapping( "/api/cart/{cartId}/{itemId}" )
   public void removeItem( @PathVariable final UUID cartId, @PathVariable UUID itemId ) {
     try {
-      api.removeItemFromShoppingCart( cartId, itemId );
+      api.removeItemFromShoppingCart( cartId, itemId ).get();
     } catch( ShoppingCartNotFoundException e ) {
       throw shoppingCartNotFoundResponse( cartId, e );
+    } catch( InterruptedException | ExecutionException e ) {
+      throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   @PostMapping( "/api/cart/{cartId}/checkout" )
-  @Transactional
   public UUID checkOutShoppingCart( @PathVariable final UUID cartId ) {
     try {
-      return api.checkOut( cartId );
+      return api.checkOut( cartId ).get();
     } catch( ShoppingCartNotFoundException e ) {
       throw shoppingCartNotFoundResponse( cartId, e );
+    } catch( InterruptedException | ExecutionException e ) {
+      throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

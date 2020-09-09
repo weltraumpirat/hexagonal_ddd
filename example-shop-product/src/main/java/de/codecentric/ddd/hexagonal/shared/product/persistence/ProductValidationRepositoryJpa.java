@@ -3,10 +3,12 @@ package de.codecentric.ddd.hexagonal.shared.product.persistence;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductNotFoundException;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductValidationEntry;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductValidationRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class ProductValidationRepositoryJpa implements ProductValidationRepository {
   private final ProductValidationCrudRepository crudRepository;
 

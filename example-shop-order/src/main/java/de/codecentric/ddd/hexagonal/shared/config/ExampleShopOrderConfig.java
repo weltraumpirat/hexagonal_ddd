@@ -4,17 +4,18 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.Messagebus;
 import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
 import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
 import de.codecentric.ddd.hexagonal.domain.order.api.OrdersApi;
-import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersFixture;
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersApiImpl;
+import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersFixture;
 import de.codecentric.ddd.hexagonal.domain.order.impl.OrdersListReadModel;
-import de.codecentric.ddd.hexagonal.domain.product.api.OrdersListRepository;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.MoneyModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.PackagingTypeModule;
-import de.codecentric.ddd.hexagonal.shared.order.persistence.*;
+import de.codecentric.ddd.hexagonal.shared.order.persistence.OrderRepositoryJpa;
+import de.codecentric.ddd.hexagonal.shared.order.persistence.OrdersListRepositoryJpa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -29,21 +30,43 @@ public class ExampleShopOrderConfig {
     return builder.build();
   }
 
-  @Bean
-  OrdersApi createOrdersApi( @Autowired final OrderCrudRepository orderRepository,
-                             @Autowired final OrderPositionCrudRepository positionsRepository,
-                             @Autowired final OrdersListCrudRepository ordersListRowCrudRepository,
-                             @Autowired final OrdersListPositionsCrudRepository ordersListPositionsCrudRepository ) {
-    final MessagebusLocal commandbus = new MessagebusLocal();
-    final MessagebusLocal eventbus = new MessagebusLocal();
-    final TransactionFactory transactionFactory = new TransactionFactory( eventbus, commandbus );
-    final OrdersListRepository repository = new OrdersListRepositoryJpa(
-      ordersListRowCrudRepository,
-      ordersListPositionsCrudRepository );
-    final OrdersListReadModel ordersListReadModel = new OrdersListReadModel( repository, eventbus );
-    final OrdersFixture ordersFixture =
-      new OrdersFixture( new OrderRepositoryJpa( orderRepository, positionsRepository ), eventbus, commandbus );
+  @Bean( name = "eventbus" )
+  public Messagebus eventbus() {
+    return new MessagebusLocal();
+  }
 
+  @Bean( name = "commandbus" )
+  public Messagebus commandbus() {
+    return new MessagebusLocal();
+  }
+
+  @Bean
+  public TransactionFactory transactionFactory(
+    @Autowired final Messagebus eventbus, final Messagebus commandbus ) {
+    return new TransactionFactory( eventbus, commandbus );
+  }
+
+  @Bean
+  public OrdersListReadModel ordersListReadModel(
+    @Autowired final OrdersListRepositoryJpa repository,
+    @Autowired final Messagebus eventbus ) {
+    return new OrdersListReadModel( repository, eventbus );
+  }
+
+  @Bean
+  public OrdersFixture ordersFixture(
+    @Autowired final OrderRepositoryJpa orderRepository,
+    @Autowired final Messagebus eventbus,
+    @Autowired final Messagebus commandbus ) {
+    return new OrdersFixture( orderRepository, eventbus, commandbus );
+
+  }
+
+  @Bean
+  OrdersApi createOrdersApi(
+    @Autowired final OrdersListReadModel ordersListReadModel,
+    @Autowired final OrdersFixture ordersFixture,
+    @Autowired TransactionFactory transactionFactory ) {
     return new OrdersApiImpl( ordersFixture, ordersListReadModel, transactionFactory );
   }
 

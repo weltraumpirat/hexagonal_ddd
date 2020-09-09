@@ -1,16 +1,17 @@
 package de.codecentric.ddd.hexagonal.domain.shoppingcart.api;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface ShoppingCartCommandsApi {
-  UUID createEmptyShoppingCart();
+  CompletableFuture<UUID> createEmptyShoppingCart();
 
-  void deleteCartById( UUID cartId );
+  CompletableFuture<Void> deleteCartById( UUID cartId );
 
-  void addItemToShoppingCart( final UUID cartId, final ShoppingCartItem shoppingCartItem );
+  CompletableFuture<Void> addItemToShoppingCart( final UUID cartId, final ShoppingCartItem shoppingCartItem );
 
-  void removeItemFromShoppingCart( final UUID cartId, final UUID itemId );
+  CompletableFuture<Void> removeItemFromShoppingCart( final UUID cartId, final UUID itemId );
 
-  UUID checkOut( final UUID cartId );
+  CompletableFuture<UUID> checkOut( final UUID cartId );
 
 }

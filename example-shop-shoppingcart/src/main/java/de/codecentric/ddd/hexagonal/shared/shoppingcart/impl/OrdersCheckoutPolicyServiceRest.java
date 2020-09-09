@@ -4,6 +4,7 @@ import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.OrdersCheckoutPolicy
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartItem;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
 public class OrdersCheckoutPolicyServiceRest implements OrdersCheckoutPolicyService {
   private final RestTemplate template;
 

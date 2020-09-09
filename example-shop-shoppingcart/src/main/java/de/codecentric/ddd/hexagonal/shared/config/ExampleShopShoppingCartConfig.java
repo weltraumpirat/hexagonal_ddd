@@ -1,13 +1,16 @@
 package de.codecentric.ddd.hexagonal.shared.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.Messagebus;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsApi;
-import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartItemsReadModel;
-import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartListReadModel;
-import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.ShoppingCartsApiImpl;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsCheckoutPolicyService;
+import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.*;
 import de.codecentric.ddd.hexagonal.shared.shoppingcart.impl.OrdersCheckoutPolicyServiceRest;
 import de.codecentric.ddd.hexagonal.shared.shoppingcart.impl.ProductValidationServiceRest;
-import de.codecentric.ddd.hexagonal.shared.shoppingcart.persistence.*;
+import de.codecentric.ddd.hexagonal.shared.shoppingcart.persistence.ShoppingCartItemsInfoRepositoryJpa;
+import de.codecentric.ddd.hexagonal.shared.shoppingcart.persistence.ShoppingCartListRowRepositoryJpa;
+import de.codecentric.ddd.hexagonal.shared.shoppingcart.persistence.ShoppingCartRepositoryJpa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,21 +20,73 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class ExampleShopShoppingCartConfig {
   @Bean
-  public RestTemplate restTemplate( RestTemplateBuilder builder ) {
+  RestTemplate restTemplate( RestTemplateBuilder builder ) {
     return builder.build();
   }
 
+  @Bean( name = "eventbus" )
+  Messagebus eventbus() {
+    return new MessagebusLocal();
+  }
+
+  @Bean( name = "commandbus" )
+  Messagebus commandbus() {
+    return new MessagebusLocal();
+  }
+
   @Bean
-  ShoppingCartsApi createShoppingCartsApi( @Autowired final RestTemplate restTemplate,
-                                           @Autowired final ShoppingCartCrudRepository cartRepository,
-                                           @Autowired final ShoppingCartItemCrudRepository cartItemRepository,
-                                           @Autowired final ShoppingCartItemInfoCrudRepository cartItemInfoRepository,
-                                           @Autowired final ShoppingCartListRowCrudRepository listRowRepository,
-                                           @Autowired final ObjectMapper objectMapper) {
-    return new ShoppingCartsApiImpl( new OrdersCheckoutPolicyServiceRest( restTemplate ),
-                                     new ProductValidationServiceRest( restTemplate ),
-                                     new ShoppingCartRepositoryJpa( cartRepository, cartItemRepository ),
-                                     new ShoppingCartListReadModel( new ShoppingCartListRowRepositoryJpa( listRowRepository )),
-                                     new ShoppingCartItemsReadModel( new ShoppingCartItemsInfoRepositoryJpa( cartItemInfoRepository, objectMapper)) );
+  TransactionFactory transactionFactory(
+    @Autowired final Messagebus eventbus,
+    @Autowired final Messagebus commandbus ) {
+    return new TransactionFactory( eventbus, commandbus );
+  }
+
+  @Bean
+  ShoppingCartsCheckoutPolicyService shoppingCartsCheckoutPolicyService(
+    @Autowired final TransactionFactory transactionFactory ) {
+    return new ShoppingCartsCheckoutPolicyServiceInMemory( transactionFactory );
+  }
+
+  @Bean
+  ShoppingCartFixture shoppingCartFixture(
+    @Autowired final ShoppingCartRepositoryJpa repository,
+    @Autowired final ProductValidationServiceRest productValidationService,
+    @Autowired final OrdersCheckoutPolicyServiceRest ordersCheckoutPolicyService,
+    @Autowired final ShoppingCartsCheckoutPolicyService shoppingCartsCheckoutPolicyService,
+    @Autowired final Messagebus eventbus,
+    @Autowired final Messagebus commandbus ) {
+    return new ShoppingCartFixture(
+      repository,
+      productValidationService,
+      ordersCheckoutPolicyService,
+      shoppingCartsCheckoutPolicyService,
+      eventbus, commandbus
+    );
+  }
+
+  @Bean
+  ShoppingCartListReadModel shoppingCartListReadModel(
+    @Autowired final ShoppingCartListRowRepositoryJpa repository,
+    @Autowired final Messagebus eventbus ) {
+    return new ShoppingCartListReadModel( repository, eventbus );
+  }
+
+  @Bean
+  ShoppingCartItemsReadModel shoppingCartItemsReadModel(
+    @Autowired final ShoppingCartItemsInfoRepositoryJpa repository,
+    @Autowired final Messagebus eventbus ) {
+    return new ShoppingCartItemsReadModel( repository, eventbus );
+  }
+
+  @Bean
+  ShoppingCartsApi createShoppingCartsApi(
+    @Autowired final ShoppingCartFixture shoppingCartFixture,
+    @Autowired final ShoppingCartItemsReadModel itemsReadModel,
+    @Autowired final ShoppingCartListReadModel listReadModel,
+    @Autowired final TransactionFactory transactionFactory ) {
+    return new ShoppingCartsApiImpl( shoppingCartFixture,
+                                     listReadModel,
+                                     itemsReadModel,
+                                     transactionFactory );
   }
 }
