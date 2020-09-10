@@ -50,11 +50,13 @@ The same application, but with "microservices", or rather, a few small services 
 - **3_microservices**: \
 Same partitioning as 2, but this time without shared anything, and the domain core properly split into several libraries.
 - **4_cqrs**: \
-Further separated commands and queries into individual services, and add a message queue. This example shows how Ports and Adapters can also apply at network level, rather than in micro architecture.
+Further separated commands and queries into individual components, and add a message bus. This is probably the most extensive (and counter-intuitive) set of changes on our journey. We move from a procedural to an event-driven (reactive) paradigm, and create lots of new code. 
 --- 
 ####COMING SOON:
-- **5_event_sourcing**: \
-We replace our relational database with an event store. This design is almost completely decoupled and all components are independently manageable.
+- **5_mq** \
+Extract the read models into individual services, and connect all the parts via a message queue. This example shows how Ports and Adapters can also apply at network level, rather than in micro architecture.
+- **6_event_sourcing**: \
+We replace some of our relational databases with an event store. This design is almost completely decoupled and all components are independently manageable.
 ---
 
 Each branch contains docker containers for all the relevant parts, that can be easily built and started using the 
