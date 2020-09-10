@@ -16,18 +16,25 @@ public class MessagebusLocal implements Messagebus {
   }
 
   @Override public <T, U extends Message<T>> void send( final U message ) {
-    final Set<MessageHandler<Message<?>>> messageHandlers = handlers.getOrDefault( message.getClass(),
-                                                                                   Collections.emptySet() );
-    final List<CompletableFuture<Void>> futures = messageHandlers.stream()
-                                                    .map( messageHandler -> CompletableFuture.runAsync(
-                                                      () -> messageHandler.accept( message ) ) )
-                                                    .collect( toUnmodifiableList() );
+    final List<CompletableFuture<Void>> futures = getHandlers( message );
     try {
       CompletableFuture.allOf( futures.toArray( CompletableFuture[]::new ) ).get();
     } catch( InterruptedException|ExecutionException e ) {
       log.warning(
         "Sending "+message.getType()+" caused an exception to be thrown: "+e.getMessage()+" \nContinuing gracefully." );
     }
+  }
+
+  private <T, U extends Message<T>> List<CompletableFuture<Void>> getHandlers( final U message ) {
+    final Set<MessageHandler<Message<?>>> messageHandlers = handlers.getOrDefault( message.getClass(),
+                                                                                   Collections.emptySet() );
+    final Set<MessageHandler<Message<?>>> wildcardHandlers = handlers.getOrDefault( message instanceof Event ? Event.class : Command.class,
+                                                                                    Collections.emptySet() );
+    messageHandlers.addAll( wildcardHandlers );
+    return messageHandlers.stream()
+             .map( messageHandler -> CompletableFuture.runAsync(
+               () -> messageHandler.accept( message ) ) )
+             .collect( toUnmodifiableList() );
   }
 
   @Override public void register( Class<?> type, final MessageHandler<Message<?>> handler ) {
@@ -48,6 +55,6 @@ public class MessagebusLocal implements Messagebus {
   }
 
   @Override public void unregisterAll() {
-    handlers.keySet().stream().collect(toUnmodifiableList()).forEach( handlers::remove );
+    handlers.keySet().stream().collect( toUnmodifiableList() ).forEach( handlers::remove );
   }
 }

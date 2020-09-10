@@ -4,16 +4,19 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import de.codecentric.ddd.hexagonal.domain.common.messaging.Messagebus;
-import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
-import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.*;
 import de.codecentric.ddd.hexagonal.domain.product.api.ProductsApi;
 import de.codecentric.ddd.hexagonal.domain.product.impl.*;
 import de.codecentric.ddd.hexagonal.shared.config.json.AmountModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.MoneyModule;
 import de.codecentric.ddd.hexagonal.shared.config.json.PackagingTypeModule;
-import de.codecentric.ddd.hexagonal.shared.product.persistence.*;
+import de.codecentric.ddd.hexagonal.shared.product.MessageLogger;
+import de.codecentric.ddd.hexagonal.shared.product.persistence.ProductListRepositoryJpa;
+import de.codecentric.ddd.hexagonal.shared.product.persistence.ProductRepositoryJpa;
+import de.codecentric.ddd.hexagonal.shared.product.persistence.ProductShoppingListRepositoryJpa;
+import de.codecentric.ddd.hexagonal.shared.product.persistence.ProductValidationRepositoryJpa;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -34,6 +37,17 @@ public class ExampleShopProductConfig {
   public TransactionFactory transactionFactory(
     @Autowired final Messagebus eventbus, final Messagebus commandbus ) {
     return new TransactionFactory( eventbus, commandbus );
+  }
+
+  @Bean
+  MessageLogger logger(
+    @Autowired @Qualifier("customMapper") final ObjectMapper mapper,
+    @Autowired final Messagebus eventbus,
+    @Autowired final Messagebus commandbus ) {
+    final MessageLogger logger = new MessageLogger( mapper );
+    eventbus.register( Event.class, logger::onMessage );
+    commandbus.register( Command.class, logger::onMessage );
+    return logger;
   }
 
   @Bean
@@ -82,6 +96,7 @@ public class ExampleShopProductConfig {
 
   @Bean
   @Primary
+  @Qualifier("customMapper")
   public static ObjectMapper createObjectMapper() {
     ObjectMapper objectmapper = new ObjectMapper();
     objectmapper.setVisibility( FIELD, ANY );

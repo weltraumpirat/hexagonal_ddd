@@ -1,17 +1,18 @@
 package de.codecentric.ddd.hexagonal.shared.config;
 
-import de.codecentric.ddd.hexagonal.domain.common.messaging.Messagebus;
-import de.codecentric.ddd.hexagonal.domain.common.messaging.MessagebusLocal;
-import de.codecentric.ddd.hexagonal.domain.common.messaging.TransactionFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.codecentric.ddd.hexagonal.domain.common.messaging.*;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsApi;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.api.ShoppingCartsCheckoutPolicyService;
 import de.codecentric.ddd.hexagonal.domain.shoppingcart.impl.*;
+import de.codecentric.ddd.hexagonal.shared.shoppingcart.impl.MessageLogger;
 import de.codecentric.ddd.hexagonal.shared.shoppingcart.impl.OrdersCheckoutPolicyServiceRest;
 import de.codecentric.ddd.hexagonal.shared.shoppingcart.impl.ProductValidationServiceRest;
 import de.codecentric.ddd.hexagonal.shared.shoppingcart.persistence.ShoppingCartItemsInfoRepositoryJpa;
 import de.codecentric.ddd.hexagonal.shared.shoppingcart.persistence.ShoppingCartListRowRepositoryJpa;
 import de.codecentric.ddd.hexagonal.shared.shoppingcart.persistence.ShoppingCartRepositoryJpa;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +43,17 @@ public class ExampleShopShoppingCartConfig {
   }
 
   @Bean
+  MessageLogger logger(
+    @Autowired @Qualifier("customMapper") final ObjectMapper mapper,
+    @Autowired final Messagebus eventbus,
+    @Autowired final Messagebus commandbus ) {
+    final MessageLogger logger = new MessageLogger( mapper );
+    eventbus.register( Event.class, logger::onMessage );
+    commandbus.register( Command.class, logger::onMessage );
+    return logger;
+  }
+
+    @Bean
   ShoppingCartsCheckoutPolicyService shoppingCartsCheckoutPolicyService(
     @Autowired final TransactionFactory transactionFactory ) {
     return new ShoppingCartsCheckoutPolicyServiceInMemory( transactionFactory );
