@@ -1,11 +1,5 @@
 import {UUID} from '../types'
 import axios from 'axios'
-import {ZERO} from '../app/App'
-
-export interface ShoppingCartData {
-  id: UUID
-  items: ShoppingCartItemData[]
-}
 
 export interface ShoppingCartItemData {
   id?: string
@@ -45,30 +39,3 @@ export class ShoppingCartsApi {
   }
 }
 
-type Currency = string
-type Amount = string
-
-class Money {
-  public readonly currency: Currency
-  public readonly amount: Amount
-
-  public constructor(currency: Currency, amount: Amount) {
-    this.currency = currency
-    this.amount = amount
-  }
-
-  public plus(money: Money): Money {
-    return new Money(this.currency, (parseFloat(this.amount) + parseFloat(money.amount)).toFixed(2))
-  }
-
-  public toString(): string {
-    return this.currency + Money.separator + this.amount
-  }
-
-  static readonly separator: string = ' '
-
-  static fromString(price: string): Money {
-    const [currency, amount]: string[] = price.split(Money.separator)
-    return new Money(currency as Currency, amount as Amount)
-  }
-}
