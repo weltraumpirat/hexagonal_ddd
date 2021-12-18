@@ -1,0 +1,14 @@
+server:
+  port: 8081
+  error:
+    include-message: always
+spring:
+  jackson:
+    default-property-inclusion: non_null
+  jpa:
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: "jdbc:mysql://${MYSQL_HOST:localhost}:3306/example_shop_db"
+    username: shop
+    password: eL,jW+6le7Q0mvR,

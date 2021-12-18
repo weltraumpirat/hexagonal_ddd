@@ -15,7 +15,7 @@ export interface ProductListRowData {
   price: string
 }
 
-const ENDPOINT_PRODUCTS = "http://localhost/api/product"
+const ENDPOINT_PRODUCTS = "http://localhost:8081/api/product"
 export class ProductsApi {
 
 
