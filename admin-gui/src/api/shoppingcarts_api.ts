@@ -13,7 +13,7 @@ export interface ShoppingCartItemData {
   price: string
 }
 
-const ENDPOINT_CARTS = 'http://localhost/api/cart'
+const ENDPOINT_CARTS = 'http://localhost:8082/api/cart'
 
 export class ShoppingCartsApi {
 
