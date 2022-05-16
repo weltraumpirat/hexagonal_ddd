@@ -12,7 +12,7 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-router-dom": "^5.1.4",
     "@types/uuid": "^3.4.7",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "history": "^4.10.1",
     "moment": "^2.27.0",
     "react": "^16.13.1",
